@@ -22,7 +22,7 @@ import { Button } from "@/components/ui/button";
 import { useWorkflowEditorEnvironment } from "@/features/workflow/editor-environment";
 import { resolveSlot, usableModelSelections, useAiStore } from "@/features/ai/store";
 import { AssetLibraryDialog } from "@/features/canvas/asset-library-dialog";
-import { ModelPicker, useSelection } from "@/features/canvas/nodes/model-picker";
+import { ModelPicker, useSelection } from "@/features/ai/model-picker";
 import {
   fixedVideoResolution,
   resolveVideoExtensionModel,
@@ -244,12 +244,9 @@ export function WorkflowImageNode({ id, data, selected }: NodeProps) {
   );
 }
 
-export function WorkflowImageGenerateNode({ id, data, selected }: NodeProps) {
-  const t = useT();
-  const update = useWorkflowStore((state) => state.updateNodeData);
+function useImageNodeModel(nodeData: ImageGenerateWorkflowNodeData) {
   const providers = useAiStore((state) => state.providers);
   const slot = useAiStore((state) => state.slots.image);
-  const nodeData = data as unknown as ImageGenerateWorkflowNodeData;
   const configuredDefault = resolveSlot(providers, slot);
   const imageDefault = configuredDefault?.model.category === "image" ? configuredDefault : null;
   const imageModels = usableModelSelections(providers, "image");
@@ -262,6 +259,15 @@ export function WorkflowImageGenerateNode({ id, data, selected }: NodeProps) {
     (!hasExplicitModel ? (fallback?.provider.id ?? implicitProviderId) : undefined);
   const modelId = nodeData.modelId || (!hasExplicitModel ? fallback?.model.id : undefined);
   const selectedModel = useSelection(providerId, modelId);
+  return { providerId, modelId, selectedModel, fallback, hasExplicitModel };
+}
+
+export function WorkflowImageGenerateNode({ id, data, selected }: NodeProps) {
+  const t = useT();
+  const update = useWorkflowStore((state) => state.updateNodeData);
+  const nodeData = data as unknown as ImageGenerateWorkflowNodeData;
+  const { providerId, modelId, selectedModel, fallback, hasExplicitModel } =
+    useImageNodeModel(nodeData);
 
   useEffect(() => {
     // 只有一个可用模型时自动写入节点；后台配置的 image 槽位也作为已有工作流的默认值。

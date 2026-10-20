@@ -14,7 +14,7 @@ import {
   videoResolutionLabel,
 } from "@/features/ai/video-models";
 import { runVideoNode } from "@/features/canvas/execution";
-import { ChipRow, ModelPicker, useSelection } from "@/features/canvas/nodes/model-picker";
+import { ChipRow, ModelPicker, useSelection } from "@/features/ai/model-picker";
 import { NodeShell } from "@/features/canvas/nodes/node-shell";
 import { useCanvasStore } from "@/features/canvas/store";
 import {

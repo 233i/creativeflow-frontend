@@ -11,7 +11,17 @@ import type { NodeDebugRequest } from "./use-node-debug";
 import type { WorkflowDraft } from "./use-workflow-draft";
 import type { WorkflowRuns } from "./use-workflow-runs";
 
-type Command = "save" | "restart" | "resume" | "partial" | "preview" | "cancel" | "debug" | "retry-node" | "skip-node" | "rollback";
+type Command =
+  | "save"
+  | "restart"
+  | "resume"
+  | "partial"
+  | "preview"
+  | "cancel"
+  | "debug"
+  | "retry-node"
+  | "skip-node"
+  | "rollback";
 type PartialPreview = {
   preview: WorkflowPartialRerunPreview;
   graph: WorkflowV2Graph;
@@ -143,7 +153,9 @@ export function useWorkflowActions({
     const run = runs.run;
     if (!run) return;
     return action("retry-node", async (current) => {
-      await creation.create("partial", document.id, run.id, () => client.retryWorkflowNode(document.id, run.id, nodeId));
+      await creation.create("partial", document.id, run.id, () =>
+        client.retryWorkflowNode(document.id, run.id, nodeId),
+      );
       if (current()) runs.refreshAfterMutation();
     });
   }
@@ -159,7 +171,9 @@ export function useWorkflowActions({
     const run = runs.run;
     if (!run) return;
     return action("rollback", async (current) => {
-      await creation.create("partial", document.id, run.id, () => client.rollbackWorkflowRun(document.id, run.id, fromNodeId));
+      await creation.create("partial", document.id, run.id, () =>
+        client.rollbackWorkflowRun(document.id, run.id, fromNodeId),
+      );
       if (current()) setPartial(null);
     });
   }

@@ -59,9 +59,7 @@ function SortButton({
   );
 }
 
-function buildCenterColumns(
-  controller: WorkflowCenterController,
-): PrimaryTableCol<CenterItem>[] {
+function buildCenterColumns(controller: WorkflowCenterController): PrimaryTableCol<CenterItem>[] {
   const { query, update, widths, selectedColumns } = controller;
   const visible = (key: string) => !optionalColumns.has(key) || selectedColumns.has(key);
   const resize = (key: string) => ({
@@ -72,14 +70,7 @@ function buildCenterColumns(
   const columns: PrimaryTableCol<CenterItem>[] = [
     {
       colKey: "name",
-      title: (
-        <SortButton
-          label="名称"
-          sort="name"
-          current={query.sort}
-          onChange={onSort}
-        />
-      ),
+      title: <SortButton label="名称" sort="name" current={query.sort} onChange={onSort} />,
       width: widths.name,
       resize: resize("name"),
       cell: ({ row }) => <CenterTitleContent controller={controller} item={row} />,
@@ -112,9 +103,7 @@ function buildCenterColumns(
         >
           {row.deletedAt
             ? "已删除 · 只读"
-            : { saved: "已保存", changed: "未发布修改", unpublished: "尚未发布" }[
-                row.draftStatus
-              ]}
+            : { saved: "已保存", changed: "未发布修改", unpublished: "尚未发布" }[row.draftStatus]}
         </span>
       ),
     },
@@ -131,12 +120,7 @@ function buildCenterColumns(
     columns.push({
       colKey: "updatedAt",
       title: (
-        <SortButton
-          label="更新时间"
-          sort="updatedAt"
-          current={query.sort}
-          onChange={onSort}
-        />
+        <SortButton label="更新时间" sort="updatedAt" current={query.sort} onChange={onSort} />
       ),
       width: widths.updatedAt,
       resize: resize("updatedAt"),
@@ -223,24 +207,16 @@ function EmptyCenterState({
 
 /** 工作流中心使用可拖动列宽的 TDesign 表格，列显示仍由个人偏好控制。 */
 export function CenterTable({ controller }: { controller: WorkflowCenterController }) {
-  const {
-    query,
-    queryKey,
-    loading,
-    error,
-    scrollRef,
-    page,
-    widths,
-    setWidthPreference,
-    density,
-  } = controller;
+  const { query, queryKey, loading, error, scrollRef, page, widths, setWidthPreference, density } =
+    controller;
   const columns = buildCenterColumns(controller);
   const hasFilters = Object.entries(query).some(
     ([key, value]) => !["sort", "offset", "limit"].includes(key) && value,
   );
-  const empty = page?.items.length === 0 && !loading ? (
-    <EmptyCenterState controller={controller} hasFilters={hasFilters} />
-  ) : undefined;
+  const empty =
+    page?.items.length === 0 && !loading ? (
+      <EmptyCenterState controller={controller} hasFilters={hasFilters} />
+    ) : undefined;
 
   return (
     <div

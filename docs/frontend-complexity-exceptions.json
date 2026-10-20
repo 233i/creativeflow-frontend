@@ -431,25 +431,9 @@
       "owner": "workflow"
     },
     {
-      "file": "features/workflow/v2/run-nodes.tsx",
-      "rule": "complexity",
-      "message": "Arrow function has a complexity of 19. Maximum allowed is 15.",
-      "count": 1,
-      "reason": "保留既有节点配置、校验与运行展示行为；后续按字段和节点职责拆分，不能增加诊断。",
-      "owner": "workflow"
-    },
-    {
       "file": "features/workflow/v2/run-presentation.ts",
       "rule": "complexity",
       "message": "Arrow function has a complexity of 34. Maximum allowed is 15.",
-      "count": 1,
-      "reason": "保留既有节点配置、校验与运行展示行为；后续按字段和节点职责拆分，不能增加诊断。",
-      "owner": "workflow"
-    },
-    {
-      "file": "features/workflow/v2/run-status.tsx",
-      "rule": "complexity",
-      "message": "Function 'V2RunStatus' has a complexity of 17. Maximum allowed is 15.",
       "count": 1,
       "reason": "保留既有节点配置、校验与运行展示行为；后续按字段和节点职责拆分，不能增加诊断。",
       "owner": "workflow"

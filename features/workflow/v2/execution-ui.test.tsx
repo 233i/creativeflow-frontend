@@ -7,6 +7,7 @@ import { NODE_DRAG_MIME } from "./placement";
 import { V2NodeLibrary } from "./node-library";
 import { V2RunPanel } from "./run-panel";
 import { V2RunProgress } from "./run-progress";
+import { V2RunStatus } from "./run-status";
 import { V2Inspector } from "./inspector";
 import { V2NodeCard, V2RunContext } from "./node-card";
 
@@ -182,6 +183,111 @@ describe("v2 canvas execution interactions", () => {
     expect(screen.getByRole("tabpanel")).toHaveTextContent("合成最终结果");
     expect(screen.getByText("12 秒")).toBeVisible();
   });
+
+  it("keeps node retry, skip and rollback separate and disables busy run actions", async () => {
+    const user = userEvent.setup();
+    const { graph, run } = fixture();
+    run.status = "failed";
+    run.nodes[1].status = "failed";
+    const props = {
+      run,
+      graph,
+      now,
+      busy: false,
+      onRefresh: vi.fn(),
+      onResume: vi.fn(),
+      onLocate: vi.fn(),
+      onRetryNode: vi.fn(),
+      onSkipNode: vi.fn(),
+      onRollback: vi.fn(),
+    };
+    const { rerender } = render(<V2RunPanel {...props} />);
+    expect(props.onRetryNode).not.toHaveBeenCalled();
+    expect(props.onSkipNode).not.toHaveBeenCalled();
+    expect(props.onRollback).not.toHaveBeenCalled();
+    const list = screen.getByRole("list", { name: "运行节点明细" });
+    const step = within(list).getByText("整理回答").closest("li")!;
+    fireEvent.click(within(step).getByText("整理回答").closest("summary")!);
+    await user.click(within(step).getByRole("button", { name: "从此节点重试" }));
+    expect(props.onRetryNode).toHaveBeenCalledExactlyOnceWith(run.nodes[1].nodeId);
+    await user.click(within(step).getByRole("button", { name: "跳过节点" }));
+    expect(props.onSkipNode).toHaveBeenCalledExactlyOnceWith(run.nodes[1].nodeId);
+    await user.click(screen.getByRole("button", { name: "从失败节点回滚重跑" }));
+    expect(props.onRollback).toHaveBeenCalledExactlyOnceWith(run.nodes[1].nodeId);
+    expect(props.onResume).not.toHaveBeenCalled();
+
+    rerender(<V2RunPanel {...props} busy />);
+    for (const name of ["重新查询", "继续未执行节点", "从失败节点回滚重跑"]) {
+      const button = screen.getByRole("button", { name });
+      expect(button).toBeDisabled();
+      await user.click(button);
+    }
+    expect(props.onRefresh).not.toHaveBeenCalled();
+    expect(props.onResume).not.toHaveBeenCalled();
+    expect(props.onRollback).toHaveBeenCalledOnce();
+
+    rerender(<V2RunPanel {...props} run={{ ...run, debugNodeId: run.nodes[1].nodeId }} />);
+    expect(screen.queryByRole("button", { name: "继续未执行节点" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "从失败节点回滚重跑" })).not.toBeInTheDocument();
+  });
+
+  it("shows retry timing and attempts without offering another retry while waiting", async () => {
+    const user = userEvent.setup();
+    const { graph, run } = fixture();
+    Object.assign(run.nodes[1], {
+      status: "retrying",
+      progress: 0.4,
+      attempt: 2,
+      maxAttempts: 3,
+      retryAt: time,
+    });
+    const retry = vi.fn();
+    const skip = vi.fn();
+    render(
+      <V2RunPanel
+        run={run}
+        graph={graph}
+        now={now}
+        busy={false}
+        onRefresh={vi.fn()}
+        onResume={vi.fn()}
+        onLocate={vi.fn()}
+        onRetryNode={retry}
+        onSkipNode={skip}
+      />,
+    );
+    const step = screen
+      .getByRole("list", { name: "运行节点明细" })
+      .querySelector('[aria-current="step"]')! as HTMLElement;
+    expect(step).toHaveTextContent("等待重试 40%");
+    fireEvent.click(within(step).getByText("整理回答").closest("summary")!);
+    expect(within(step).getByText(/等待自动重试/)).toBeVisible();
+    expect(within(step).getByText("尝试 2 / 3")).toBeVisible();
+    expect(within(step).queryByRole("button", { name: "从此节点重试" })).not.toBeInTheDocument();
+    await user.click(within(step).getByRole("button", { name: "跳过节点" }));
+    expect(skip).toHaveBeenCalledExactlyOnceWith(run.nodes[1].nodeId);
+    expect(retry).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["running", "执行中 42%", "text-primary"],
+    ["retrying", "等待重试 42%", "text-primary"],
+    ["succeeded", "已复用", "text-blue-600"],
+    ["failed", "失败", "text-destructive"],
+    ["cancelled", "已取消", "text-muted-foreground"],
+    ["skipped", "已跳过", "text-muted-foreground"],
+    ["queued", "等待执行", "text-muted-foreground"],
+  ] as const)(
+    "preserves %s status presentation even when marked reused",
+    (status, label, color) => {
+      render(<V2RunStatus status={status} reused progress={42} />);
+      const badge = screen.getByText(label);
+      expect(badge).toHaveClass(color);
+      if (status === "running" || status === "retrying")
+        expect(badge.querySelector("svg")).toHaveClass("animate-spin");
+      else expect(badge.querySelector("svg")).not.toHaveClass("animate-spin");
+    },
+  );
 
   it("does not claim a running task is finished between node updates", () => {
     const { graph, run } = fixture();

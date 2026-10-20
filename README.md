@@ -69,7 +69,7 @@ npm run test:e2e    # Browser tests; needs an isolated test API
 ```
 
 These commands are quality gates, not a claim that they currently all pass.
-Known formatting/boundary failures and browser prerequisites are documented in
+Browser prerequisites and verification limits are documented in
 [maintenance](docs/frontend-maintenance.md#已知检查限制).
 Keep both npm and Bun lockfiles in sync when changing dependencies: local
 verification uses npm, the Dockerfile uses Bun.

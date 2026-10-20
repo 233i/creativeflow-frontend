@@ -195,6 +195,24 @@ function hasScriptForbiddenField(value: unknown): boolean {
   );
 }
 
+function validateScript(data: Record<string, unknown>, id: string) {
+  if (data.language !== "python" && data.language !== "javascript")
+    throw new Error(`节点 ${id} 脚本语言无效。`);
+  if (!validFieldSchema(data.outputFields)) throw new Error(`节点 ${id} 需要脚本输出字段。`);
+  if (!text(data.code) || data.code.length === 0 || data.code.length > 32768)
+    throw new Error(`节点 ${id} 脚本代码不能为空且不能超过 32 KiB。`);
+  if (
+    !finite(data.timeoutSeconds) ||
+    data.timeoutSeconds < 1 ||
+    data.timeoutSeconds > 30 ||
+    data.timeoutSeconds !== Math.trunc(data.timeoutSeconds)
+  )
+    throw new Error(`节点 ${id} 脚本超时必须为 1–30 秒整数。`);
+  const fields = [...(data.fields as unknown[]), ...(data.outputFields as unknown[])];
+  if (fields.some(hasScriptForbiddenField))
+    throw new Error(`节点 ${id} 脚本字段不能使用图片或知识证据类型。`);
+}
+
 function validateConfiguration(kind: WorkflowV2Kind, data: Record<string, unknown>, id: string) {
   if (kind === "httpRequest" && (!isNodeData("httpRequest", data) || httpConfigurationError(data)))
     throw new Error(`节点 ${id} HTTP 配置无效。`);
@@ -203,23 +221,7 @@ function validateConfiguration(kind: WorkflowV2Kind, data: Record<string, unknow
   if (kind === "intentClassify" && !validators.intents(data.intents))
     throw new Error(`节点 ${id} 分类配置无效。`);
   if (kind === "transform") validateTransform(data, id);
-  if (kind === "script") {
-    if (data.language !== "python" && data.language !== "javascript")
-      throw new Error(`节点 ${id} 脚本语言无效。`);
-    if (!validFieldSchema(data.outputFields)) throw new Error(`节点 ${id} 需要脚本输出字段。`);
-    if (!text(data.code) || data.code.length === 0 || data.code.length > 32768)
-      throw new Error(`节点 ${id} 脚本代码不能为空且不能超过 32 KiB。`);
-    if (
-      !finite(data.timeoutSeconds) ||
-      data.timeoutSeconds < 1 ||
-      data.timeoutSeconds > 30 ||
-      data.timeoutSeconds !== Math.trunc(data.timeoutSeconds)
-    )
-      throw new Error(`节点 ${id} 脚本超时必须为 1–30 秒整数。`);
-    const fields = [...(data.fields as unknown[]), ...(data.outputFields as unknown[])];
-    if (fields.some(hasScriptForbiddenField))
-      throw new Error(`节点 ${id} 脚本字段不能使用图片或知识证据类型。`);
-  }
+  if (kind === "script") validateScript(data, id);
 }
 
 function assertNode(value: unknown): asserts value is WorkflowV2Node {

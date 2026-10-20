@@ -16,6 +16,9 @@ Node 版本见 `.node-version`。`verify` 顺序执行 `check` 和生产构建�
 
 文件超过 400 行、组件超过 200 行时人工复查职责；静态注册表和字典单独评估。类型检查也拒绝未使用的局部声明和参数。跨功能入口集中在 `scripts/frontend-boundaries/config.mjs`，新增入口需要说明调用方和职责，不开放整个目录；领域模块不能直接或间接加载 UI、store、API 或框架运行时。运行时循环依赖当前没有例外。
 
+画布和媒体工作流通过 `features/ai/model-picker.tsx` 共用模型选择、已选模型解析和参数选项；
+不要从其他功能直接引用 `features/canvas/nodes/` 内部组件。
+
 ## 新增通用工作流节点
 
 1. 在 `features/workflow/v2/domain/nodes.ts` 定义节点种类及其配置类型，在 `domain/node-definitions.ts` 的完整映射中添加默认值、字段、端口、分组及能力。领域注册表不导入 React 或图标。
@@ -98,12 +101,11 @@ npm run test:e2e
 
 ## 已知检查限制
 
-当前源码仍有部分文件未符合 Prettier 格式，完整 `verify` 会先在 `format:check` 失败；
-依赖边界检查还会报告
-`features/workflow/nodes/workflow-nodes.tsx` 直接引用
-`features/canvas/nodes/model-picker.tsx`。
-执行结果以本地检查和 Actions 为准，不能因单独构建/单元测试通过而声称完整门禁通过。
-不要关闭检查或给新问题添加豁免；修复这些问题应作为独立代码变更。
+`verify` 不启动后端，也不包含跨服务 Playwright 验收。它通过只代表当前环境的格式、
+lint、边界、复杂度、类型、单元测试和生产构建通过，不代表模型调用或浏览器联调通过。
+CI 的浏览器作业还需要独立测试 API；未配置而跳过时必须如实说明。
+使用 `.node-version` 中的 Node 版本复现 Actions，并查看完整命令结果，不能只重跑最后的构建。
+不要关闭检查或给新问题添加豁免。
 
 ## 格式与模块约定
 

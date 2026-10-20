@@ -5,6 +5,8 @@ export const featureEntries = {
   ai: [
     "api",
     "embedding-api",
+    // 画布和媒体工作流共用模型选择与参数选项，不互相依赖节点内部组件。
+    "model-picker",
     // 设置页只依赖重排序的配置/显式测试 API，不访问其内部实现。
     "rerank-api",
     "presets/index",

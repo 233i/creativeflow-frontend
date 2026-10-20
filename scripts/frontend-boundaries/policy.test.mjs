@@ -41,6 +41,22 @@ describe("frontend dependency boundaries", () => {
     expect(failures.some((value) => value.includes("共享模块不能引用页面"))).toBe(true);
     expect(failures.some((value) => value.includes("controllers/actions"))).toBe(true);
   });
+  it("allows the shared AI model picker without exposing canvas node internals", () => {
+    expect(
+      boundaryViolations(
+        sources({
+          "features/ai/model-picker.tsx": "export const ModelPicker=()=>null;",
+          "features/canvas/nodes/image-gen-node.tsx":
+            'import {ModelPicker} from "@/features/ai/model-picker"; export const ImageNode=ModelPicker;',
+          "features/workflow/nodes/workflow-nodes.tsx":
+            'import {ModelPicker} from "@/features/ai/model-picker"; import {PrivateNode} from "@/features/canvas/nodes/private-node"; export const WorkflowNode=()=>[ModelPicker,PrivateNode];',
+          "features/canvas/nodes/private-node.tsx": "export const PrivateNode=()=>null;",
+        }),
+      ),
+    ).toEqual([
+      "跨功能调用需要显式入口: features/workflow/nodes/workflow-nodes.tsx -> features/canvas/nodes/private-node.tsx",
+    ]);
+  });
   it("finds dynamic-import cycles and all cyclic edges while ignoring type-only back references", () => {
     const graph = dependencyGraph(
       sources({

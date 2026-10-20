@@ -14,7 +14,7 @@ vi.mock("@/components/providers/i18n-provider", () => ({
   useT: () => (key: string) => key,
 }));
 
-vi.mock("@/features/canvas/nodes/model-picker", () => ({
+vi.mock("@/features/ai/model-picker", () => ({
   ChipRow: () => null,
   ModelPicker: () => null,
   useSelection: () => ({

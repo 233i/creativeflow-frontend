@@ -82,33 +82,13 @@ export function V2RunPanel({
       </div>
       <V2OverallProgress value={summary.progress} failed={run.status === "failed"} />
       <p className="mt-3 break-all font-mono text-[10px] text-muted-foreground">任务 {run.id}</p>
-      <div className="mt-3 flex flex-wrap gap-2">
-        <button
-          type="button"
-          disabled={busy}
-          onClick={onRefresh}
-          className="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs hover:bg-muted disabled:opacity-50"
-        >
-          <RefreshCw className="size-3" aria-hidden />
-          重新查询
-        </button>
-        {run.status === "failed" && !run.debugNodeId && (
-          <button
-            type="button"
-            disabled={busy}
-            onClick={onResume}
-            className="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs hover:bg-muted disabled:opacity-50"
-          >
-            <RotateCcw className="size-3" aria-hidden />
-            继续未执行节点
-          </button>
-        )}
-        {run.status === "failed" && !run.debugNodeId && onRollback && run.nodes.some((node) => node.status === "failed") && (
-          <button type="button" disabled={busy} onClick={() => onRollback(run.nodes.find((node) => node.status === "failed")!.nodeId)} className="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs hover:bg-muted disabled:opacity-50">
-            <RotateCcw className="size-3" aria-hidden /> 从失败节点回滚重跑
-          </button>
-        )}
-      </div>
+      <RunRecoveryActions
+        run={run}
+        busy={busy}
+        onRefresh={onRefresh}
+        onResume={onResume}
+        onRollback={onRollback}
+      />
       <p className="mt-3 rounded-lg bg-muted/60 p-2.5 text-[11px] leading-5 text-muted-foreground">
         结果来自提交时的快照。关闭面板或页面不会停止任务；重新查询不会重新生成。状态不明的模型或外部请求不会自动重发。
       </p>
@@ -172,7 +152,14 @@ export function V2RunPanel({
         className="pt-4 outline-none"
       >
         {tab === "steps" ? (
-          <V2RunNodes run={run} graph={graph} now={now} onLocate={onLocate} onRetryNode={onRetryNode} onSkipNode={onSkipNode} />
+          <V2RunNodes
+            run={run}
+            graph={graph}
+            now={now}
+            onLocate={onLocate}
+            onRetryNode={onRetryNode}
+            onSkipNode={onSkipNode}
+          />
         ) : tab === "calls" ? (
           <V2ModelCalls run={run} graph={graph} onLocate={onLocate} />
         ) : outputs.length ? (
@@ -190,5 +177,57 @@ export function V2RunPanel({
         )}
       </div>
     </section>
+  );
+}
+
+function RunRecoveryActions({
+  run,
+  busy,
+  onRefresh,
+  onResume,
+  onRollback,
+}: {
+  run: WorkflowRun;
+  busy: boolean;
+  onRefresh: () => void;
+  onResume: () => void;
+  onRollback?: (id: string) => void;
+}) {
+  return (
+    <div className="mt-3 flex flex-wrap gap-2">
+      <button
+        type="button"
+        disabled={busy}
+        onClick={onRefresh}
+        className="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs hover:bg-muted disabled:opacity-50"
+      >
+        <RefreshCw className="size-3" aria-hidden />
+        重新查询
+      </button>
+      {run.status === "failed" && !run.debugNodeId && (
+        <button
+          type="button"
+          disabled={busy}
+          onClick={onResume}
+          className="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs hover:bg-muted disabled:opacity-50"
+        >
+          <RotateCcw className="size-3" aria-hidden />
+          继续未执行节点
+        </button>
+      )}
+      {run.status === "failed" &&
+        !run.debugNodeId &&
+        onRollback &&
+        run.nodes.some((node) => node.status === "failed") && (
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => onRollback(run.nodes.find((node) => node.status === "failed")!.nodeId)}
+            className="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs hover:bg-muted disabled:opacity-50"
+          >
+            <RotateCcw className="size-3" aria-hidden /> 从失败节点回滚重跑
+          </button>
+        )}
+    </div>
   );
 }

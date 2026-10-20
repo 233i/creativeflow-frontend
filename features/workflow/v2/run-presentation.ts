@@ -60,11 +60,16 @@ export function runSummary(run: WorkflowRun) {
   const settled = run.nodes.filter(
     (node) => node.status !== "queued" && node.status !== "running" && node.status !== "retrying",
   ).length;
-  const current = active ? run.nodes.find((node) => node.status === "running" || node.status === "retrying") : undefined;
+  const current = active
+    ? run.nodes.find((node) => node.status === "running" || node.status === "retrying")
+    : undefined;
   const partial = active
     ? run.nodes.reduce(
         (sum, node) =>
-          sum + (node.status === "running" || node.status === "retrying" ? (reportedProgress(node.progress) ?? 0) / 100 : 0),
+          sum +
+          (node.status === "running" || node.status === "retrying"
+            ? (reportedProgress(node.progress) ?? 0) / 100
+            : 0),
         0,
       )
     : 0;

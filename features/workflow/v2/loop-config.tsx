@@ -23,7 +23,8 @@ export function LoopConfig({
       <div>
         <h3 className="text-xs font-semibold">{isBatch ? "批处理配置" : "循环配置"}</h3>
         <p className="mt-1 text-[11px] leading-5 text-muted-foreground">
-          每个元素（或每个批次）执行一次子流程，结果按输入顺序返回。子流程不能包含知识库或 HTTP 节点；外部副作用请在循环外显式编排。
+          每个元素（或每个批次）执行一次子流程，结果按输入顺序返回。子流程不能包含知识库或 HTTP
+          节点；外部副作用请在循环外显式编排。
         </p>
       </div>
       <div className="grid grid-cols-2 gap-2">
@@ -88,7 +89,12 @@ export function LoopConfig({
             setBodyText(event.target.value);
             try {
               const parsed = JSON.parse(event.target.value);
-              if (parsed && parsed.schemaVersion === 1 && Array.isArray(parsed.nodes) && Array.isArray(parsed.edges))
+              if (
+                parsed &&
+                parsed.schemaVersion === 1 &&
+                Array.isArray(parsed.nodes) &&
+                Array.isArray(parsed.edges)
+              )
                 update({ body: parsed });
             } catch {
               // 只在 JSON 完整时写回草稿，避免每次输入都破坏当前可执行图。
@@ -107,8 +113,18 @@ export function LoopConfig({
         type="button"
         className={actionClass}
         onClick={() => {
-          const retry = data.retry ?? { maxAttempts: 1, backoffMs: 1000, maxBackoffMs: 120000, retryOn: [] };
-          update({ retry: { ...retry, maxAttempts: Math.min(5, Math.max(1, Number(retry.maxAttempts) || 1)) } });
+          const retry = data.retry ?? {
+            maxAttempts: 1,
+            backoffMs: 1000,
+            maxBackoffMs: 120000,
+            retryOn: [],
+          };
+          update({
+            retry: {
+              ...retry,
+              maxAttempts: Math.min(5, Math.max(1, Number(retry.maxAttempts) || 1)),
+            },
+          });
         }}
       >
         使用默认安全重试策略

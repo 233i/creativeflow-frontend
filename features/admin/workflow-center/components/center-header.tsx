@@ -42,7 +42,8 @@ export function CenterHeader({ controller }: { controller: WorkflowCenterControl
           aria-label="设置显示列"
           onPress={() => setColumnDialog(true)}
         >
-          <Columns3 size={15} />显示列
+          <Columns3 size={15} />
+          显示列
         </Button>
         <Button
           size="icon-sm"

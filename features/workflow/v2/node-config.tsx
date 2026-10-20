@@ -22,6 +22,12 @@ import { SchemaValueEditor } from "./schema-editor";
 import { ImageValuePicker, parseImageValue } from "./image-value-picker";
 import { RetryConfig } from "./retry-config";
 
+const FIELD_HEADINGS: Partial<Record<WorkflowV2Node["type"], string>> = {
+  start: "外部输入字段",
+  end: "最终输出字段",
+  merge: "汇合输出字段",
+};
+
 export function V2NodeConfig({
   node,
   graph,
@@ -74,15 +80,7 @@ export function V2NodeConfig({
         <RetryConfig data={data} onChange={(next) => onChange(next as WorkflowV2NodeData)} />
       )}
       <fieldset className="space-y-3">
-        <legend className="mb-2 text-xs font-semibold">
-          {kind === "start"
-            ? "外部输入字段"
-            : kind === "end"
-              ? "最终输出字段"
-              : kind === "merge"
-                ? "汇合输出字段"
-                : "节点输入"}
-        </legend>
+        <legend className="mb-2 text-xs font-semibold">{FIELD_HEADINGS[kind] ?? "节点输入"}</legend>
         {data.fields.map((field, index) => {
           const connections = graph.edges.filter(
             (edge) => edge.target === node.id && edge.targetHandle === field.key,

@@ -57,9 +57,11 @@ export function CenterChannelsContent({
           data-tone={item.templateStatus === "published" ? "success" : "default"}
         >
           模板 {item.templateVersion ? `v${item.templateVersion} · ` : ""}
-          {{ published: "已上架", draft: "草稿", archived: "已下架", none: "—" }[
-            item.templateStatus
-          ]}
+          {
+            { published: "已上架", draft: "草稿", archived: "已下架", none: "—" }[
+              item.templateStatus
+            ]
+          }
         </Link>
       )}
     </div>

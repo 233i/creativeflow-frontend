@@ -158,17 +158,28 @@ export function createWorkflowApiClient(baseUrl = BASE) {
   }
 
   function retryWorkflowNode(id: string, runId: string, nodeId: string): Promise<WorkflowRun> {
-    return request(`/${id}/runs/${runId}/nodes/${encodeURIComponent(nodeId)}/retry`, { method: "POST" });
+    return request(`/${id}/runs/${runId}/nodes/${encodeURIComponent(nodeId)}/retry`, {
+      method: "POST",
+    });
   }
 
-  function skipWorkflowNode(id: string, runId: string, nodeId: string, reason?: string): Promise<WorkflowRun> {
+  function skipWorkflowNode(
+    id: string,
+    runId: string,
+    nodeId: string,
+    reason?: string,
+  ): Promise<WorkflowRun> {
     return request(`/${id}/runs/${runId}/nodes/${encodeURIComponent(nodeId)}/skip`, {
       method: "POST",
       body: JSON.stringify({ reason }),
     });
   }
 
-  function rollbackWorkflowRun(id: string, runId: string, fromNodeId: string): Promise<WorkflowRun> {
+  function rollbackWorkflowRun(
+    id: string,
+    runId: string,
+    fromNodeId: string,
+  ): Promise<WorkflowRun> {
     return request(`/${id}/runs/${runId}/rollback`, {
       method: "POST",
       body: JSON.stringify({ fromNodeId }),

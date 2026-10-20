@@ -4,7 +4,7 @@ import { type NodeProps, NodeResizer, useReactFlow } from "@xyflow/react";
 import { Sparkles, Wand2 } from "lucide-react";
 import { useT } from "@/components/providers/i18n-provider";
 import { Button } from "@/components/ui/button";
-import { ChipRow, ModelPicker, useSelection } from "@/features/canvas/nodes/model-picker";
+import { ChipRow, ModelPicker, useSelection } from "@/features/ai/model-picker";
 import { NodeShell } from "@/features/canvas/nodes/node-shell";
 import { useCanvasStore } from "@/features/canvas/store";
 import { runImageNode } from "@/features/canvas/execution";
