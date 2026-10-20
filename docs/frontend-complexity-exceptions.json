@@ -1,11 +1,10 @@
 {
   "capturedAt": "2026-09-28",
-  "baselineCommit": "a1f6d1a",
   "thresholds": {
     "complexity": 15,
     "maxDepth": 4
   },
-  "note": "这是仍需治理的存量清单，不是已验收为低复杂度。新文件、新函数、复杂度上升或过期例外均失败；禁止为新实现增加例外。P0 原始统计另存 frontend-complexity-baseline.json。",
+  "note": "这是 check:complexity 使用的存量清单，不代表已验收为低复杂度。新文件、新函数、复杂度上升或过期例外均失败；禁止为新实现增加例外。",
   "entries": [
     {
       "file": "features/admin/admin-console.tsx",
