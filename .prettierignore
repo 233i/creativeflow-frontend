@@ -1,0 +1,24 @@
+# Dependencies, build products, test output, and browser artifacts.
+node_modules/
+.next/
+out/
+build/
+dist/
+coverage/
+output/
+.playwright-cli/
+test-results/
+playwright-report/
+
+# Static media and copied third-party provider icons.
+public/
+
+# Generated files are maintained by their own tools.
+package-lock.json
+bun.lock
+next-env.d.ts
+*.tsbuildinfo
+
+# Local environment configuration is never part of formatting.
+.env*
+*.env

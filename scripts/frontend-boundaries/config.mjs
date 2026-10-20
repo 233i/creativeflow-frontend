@@ -1,0 +1,68 @@
+/** 跨功能的显式入口。增加入口时说明调用方与职责，不能开放整个目录。 */
+export const featureEntries = {
+  admin: ["api", "workflow-api"],
+  agent: ["agent-panel", "agent-runtime", "canvas-control", "store"],
+  ai: [
+    "api",
+    "embedding-api",
+    // 设置页只依赖重排序的配置/显式测试 API，不访问其内部实现。
+    "rerank-api",
+    "presets/index",
+    "protocol-support",
+    "provider-icons",
+    "store",
+    "types",
+    "video-models",
+  ],
+  assets: ["api", "commands", "selection", "presentation", "thumbnail", "types"],
+  auth: ["auth-menu"],
+  canvas: [
+    "api",
+    "asset-library-dialog",
+    "execution",
+    "image-edit",
+    "image-jobs",
+    "image-ops",
+    "store",
+    "sync",
+    "types",
+    "upstream",
+  ],
+  "http-requests": ["credential-manager", "credential-panel", "credentials-api"],
+  knowledge: [
+    "access-api",
+    "knowledge-panel",
+    // 通用编排复用同一份无凭据检索契约、配置控件及执行诊断。
+    "retrieval-types",
+    "retrieval-settings",
+    "retrieval-trace",
+  ],
+  projects: ["create-project-dialog"],
+  settings: ["management-panels", "settings-dialog"],
+  skills: ["api", "store"],
+  workflow: [
+    "api",
+    "editor-assets",
+    "editor-session",
+    "external-api/api",
+    "external-api/contracts",
+    "external-api/publish-panel",
+    "graph-import",
+    "persistence",
+    "presentation/run-status",
+    "readonly-graph",
+    "template-library-dialog",
+    "template-metadata-dialog",
+    "template",
+    "templates-api",
+    "types",
+    "v2/http-types",
+    "v2/inspector",
+    "v2/run-nodes",
+    "v2/types",
+    "workflow-page",
+  ],
+};
+
+// P4 基线没有运行时环；不为未来循环预留通配例外。
+export const cycleExceptions = [];

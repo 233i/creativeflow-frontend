@@ -1,0 +1,401 @@
+[
+  {
+    "type": "start",
+    "label": "开始",
+    "data": {
+      "fields": [
+        {
+          "key": "question",
+          "label": "问题",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    "outputs": [
+      {
+        "key": "question",
+        "label": "问题",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "usesModel": false,
+    "branch": false,
+    "group": "输入与输出"
+  },
+  {
+    "type": "llm",
+    "label": "LLM",
+    "data": {
+      "fields": [
+        {
+          "key": "question",
+          "label": "问题",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "modelId": "",
+      "systemPrompt": "请准确、简洁地回答用户的问题。",
+      "prompt": [
+        {
+          "input": "question"
+        }
+      ],
+      "maxOutputTokens": 512,
+      "temperature": 0.7,
+      "timeoutSeconds": 120
+    },
+    "outputs": [
+      {
+        "key": "text",
+        "label": "生成文本",
+        "type": "string",
+        "required": true,
+        "maxLength": 16000
+      }
+    ],
+    "usesModel": true,
+    "branch": false,
+    "group": "模型与工具"
+  },
+  {
+    "type": "knowledgeRetrieve",
+    "label": "知识检索",
+    "data": {
+      "fields": [
+        {
+          "key": "question",
+          "type": "string",
+          "required": true
+        },
+        { "key": "originalQuestion", "type": "string", "required": false }
+      ],
+      "libraryId": "",
+      "versionId": "",
+      "topK": 4,
+      "retrievalMode": "hybrid",
+      "denseCandidates": 32,
+      "keywordCandidates": 32,
+      "rerankCandidates": 24,
+      "neighborRadius": 1,
+      "exactMatch": "prefer",
+      "rerankFailurePolicy": "fail",
+      "minScore": 0,
+      "maxContextChunks": 8
+    },
+    "outputs": [
+      {
+        "key": "context",
+        "type": "contextChunks",
+        "required": true
+      }
+    ],
+    "usesModel": false,
+    "branch": false,
+    "group": "模型与工具"
+  },
+  {
+    "type": "knowledgeAnswer",
+    "label": "知识问答",
+    "data": {
+      "fields": [
+        {
+          "key": "question",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "context",
+          "type": "contextChunks",
+          "required": true
+        }
+      ],
+      "modelId": "",
+      "systemPrompt": "用简洁的中文回答。",
+      "maxOutputTokens": 1024,
+      "temperature": 0,
+      "timeoutSeconds": 120
+    },
+    "outputs": [
+      {
+        "key": "answer",
+        "type": "answer",
+        "required": true
+      }
+    ],
+    "usesModel": true,
+    "branch": false,
+    "group": "模型与工具"
+  },
+  {
+    "type": "condition",
+    "label": "条件分支",
+    "data": {
+      "fields": [
+        {
+          "key": "flag",
+          "label": "判断值",
+          "type": "boolean",
+          "required": true
+        }
+      ],
+      "cases": [
+        {
+          "key": "matched",
+          "label": "IF · 满足条件",
+          "match": "all",
+          "conditions": [
+            {
+              "input": "flag",
+              "operator": "isTrue"
+            }
+          ]
+        }
+      ]
+    },
+    "outputs": [
+      {
+        "key": "route",
+        "label": "选中分支",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "usesModel": false,
+    "branch": true,
+    "group": "流程控制"
+  },
+  {
+    "type": "merge",
+    "label": "结果汇合",
+    "data": {
+      "fields": [
+        {
+          "key": "result",
+          "label": "结果",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    "outputs": [
+      {
+        "key": "result",
+        "label": "结果",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "usesModel": false,
+    "branch": false,
+    "group": "流程控制"
+  },
+  {
+    "type": "httpRequest",
+    "label": "HTTP 请求",
+    "data": {
+      "fields": [
+        {
+          "key": "question",
+          "label": "输入",
+          "type": "string",
+          "required": false,
+          "default": ""
+        }
+      ],
+      "http": {
+        "method": "GET",
+        "url": "",
+        "query": [],
+        "headers": [],
+        "bodyType": "none",
+        "body": "",
+        "form": [],
+        "timeoutSeconds": 30,
+        "responseLimitBytes": 1048576,
+        "failOnHttpError": true
+      },
+      "outputFields": [],
+      "extract": {},
+      "credentialId": "",
+      "credentialRevisionId": ""
+    },
+    "outputs": [
+      {
+        "key": "statusCode",
+        "label": "HTTP 状态码",
+        "type": "number",
+        "required": true
+      },
+      {
+        "key": "body",
+        "label": "响应正文",
+        "type": "string",
+        "required": true,
+        "maxLength": 1048576
+      },
+      {
+        "key": "headers",
+        "label": "响应头",
+        "type": "object",
+        "required": true
+      }
+    ],
+    "usesModel": false,
+    "branch": false,
+    "group": "模型与工具"
+  },
+  {
+    "type": "end",
+    "label": "结束",
+    "data": {
+      "fields": [
+        {
+          "key": "answer",
+          "label": "回答",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    "outputs": [],
+    "usesModel": false,
+    "branch": false,
+    "group": "输入与输出"
+  },
+  {
+    "type": "parameterExtract",
+    "label": "参数提取",
+    "data": {
+      "fields": [
+        {
+          "key": "question",
+          "label": "问题",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "modelId": "",
+      "systemPrompt": "只提取输入中有依据的参数，不要编造缺失信息。",
+      "prompt": [
+        {
+          "input": "question"
+        }
+      ],
+      "maxOutputTokens": 2048,
+      "temperature": 0,
+      "timeoutSeconds": 120,
+      "outputFields": [
+        {
+          "key": "result",
+          "label": "提取结果",
+          "description": "需要从输入提取的内容",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "outputTransport": "prompt"
+    },
+    "outputs": [
+      {
+        "key": "result",
+        "label": "提取结果",
+        "description": "需要从输入提取的内容",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "usesModel": true,
+    "branch": false,
+    "group": "数据处理"
+  },
+  {
+    "type": "intentClassify",
+    "label": "意图分类",
+    "data": {
+      "fields": [
+        {
+          "key": "question",
+          "label": "问题",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "modelId": "",
+      "systemPrompt": "按分类说明识别输入的主要意图。",
+      "prompt": [
+        {
+          "input": "question"
+        }
+      ],
+      "maxOutputTokens": 512,
+      "temperature": 0,
+      "timeoutSeconds": 120,
+      "outputTransport": "prompt",
+      "intents": [
+        {
+          "key": "question",
+          "label": "咨询",
+          "description": "询问信息、用法或规则"
+        },
+        {
+          "key": "feedback",
+          "label": "反馈",
+          "description": "提交意见、问题或投诉"
+        }
+      ]
+    },
+    "outputs": [
+      {
+        "key": "route",
+        "label": "选中分支",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "usesModel": true,
+    "branch": true,
+    "group": "流程控制"
+  },
+  {
+    "type": "transform",
+    "label": "变量处理",
+    "data": {
+      "fields": [
+        {
+          "key": "input",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "outputFields": [
+        {
+          "key": "result",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "assignments": [
+        {
+          "key": "result",
+          "expression": {
+            "op": "input",
+            "input": "input"
+          }
+        }
+      ]
+    },
+    "outputs": [
+      {
+        "key": "result",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "usesModel": false,
+    "branch": false,
+    "group": "数据处理"
+  }
+]

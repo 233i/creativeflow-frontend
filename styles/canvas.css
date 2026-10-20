@@ -1,0 +1,324 @@
+/* ---------------------------------------------------------------------------
+   Canvas motion
+   ---------------------------------------------------------------------------
+   Every animation below moves only `opacity` and `transform`. Those two are the
+   properties a compositor can run without the main thread, so they keep working
+   at full rate while the canvas is busy. Anything that triggers layout — width,
+   top, margin — would queue behind the same frames a pan is already competing
+   for, which is the opposite of what this file is for.
+   --------------------------------------------------------------------------- */
+
+@keyframes canvas-rise {
+  from {
+    opacity: 0;
+    transform: translateY(-0.375rem) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes canvas-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes canvas-fade {
+  from {
+    opacity: 0;
+    transform: translateY(0.125rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* 节点生成时从左到右扫过的高亮。 */
+@keyframes canvas-sweep {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* 节点有运行进行时显示的呼吸光环。 */
+@keyframes canvas-breathe {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes agent-message-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.375rem) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes agent-tool-in {
+  from {
+    opacity: 0;
+    transform: translateX(-0.375rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes agent-thinking-breathe {
+  0%,
+  100% {
+    border-color: color-mix(in oklab, var(--border) 75%, transparent);
+    background-color: color-mix(in oklab, var(--muted) 25%, transparent);
+  }
+  50% {
+    border-color: color-mix(in oklab, var(--primary) 35%, var(--border));
+    background-color: color-mix(in oklab, var(--primary) 7%, transparent);
+  }
+}
+
+@keyframes agent-thinking-dot {
+  0%,
+  80%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.75);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@layer components {
+  /* 实色面板让移动中的节点与控件保持层次，也避免多个实时背景模糊层。 */
+  .canvas-panel {
+    background-color: var(--background);
+    animation: canvas-rise 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .studio-canvas .react-flow {
+    --xy-background-color: var(--canvas);
+    --xy-background-pattern-dots-color: color-mix(
+      in oklab,
+      var(--muted-foreground) 28%,
+      transparent
+    );
+    --xy-edge-stroke: color-mix(in oklab, var(--muted-foreground) 55%, transparent);
+    --xy-controls-button-background-color: var(--background);
+    --xy-controls-button-background-color-hover: var(--accent);
+    --xy-controls-button-color: var(--foreground);
+    --xy-controls-button-border-color: var(--border);
+    --xy-minimap-background-color: var(--background);
+    --xy-minimap-mask-background-color: color-mix(in oklab, var(--muted) 60%, transparent);
+  }
+
+  .studio-canvas .react-flow__controls {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 0.625rem;
+    box-shadow: var(--elevation-node);
+  }
+
+  .studio-canvas .react-flow__controls-button {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .studio-canvas .react-flow__minimap {
+    box-shadow: var(--elevation-node);
+  }
+
+  .canvas-menu {
+    animation: canvas-pop 140ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .canvas-fade-in {
+    animation: canvas-fade 200ms ease-out both;
+  }
+
+  /*
+   * 节点进入画布时的效果。
+   *
+   * 作用于节点自身框架，而不是 React Flow 包装器：包装器通过 transform 定位节点，
+   * 对其做动画会与库争用同一属性。连接柄和调整大小轮廓从存储读取节点宽高，
+   * 因此动画播放时它们保持原位。
+   */
+  .canvas-node {
+    animation: canvas-pop 180ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    transition:
+      box-shadow 160ms ease-out,
+      border-color 160ms ease-out;
+  }
+
+  /* 打开项目时同时挂载的数十个节点不重放入场动画。 */
+  [data-hydrating] .canvas-node {
+    animation: none;
+  }
+
+  .canvas-node-busy::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 1.5px var(--ring);
+    animation: canvas-breathe 1.8s ease-in-out infinite;
+  }
+
+  /* `output` 也是 React Flow 内置节点名称。若不显式重置，其默认选择器会在自定义结果节点周围
+     添加白色面板、边框和内边距。 */
+  .workflow-editor .react-flow__node-output {
+    border: 0 !important;
+    background: transparent !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    color: inherit !important;
+    font-size: inherit !important;
+    text-align: initial !important;
+  }
+
+  .workflow-editor .react-flow__edge-path {
+    stroke: color-mix(in oklab, var(--muted-foreground) 55%, transparent);
+    stroke-width: 1.75;
+  }
+
+  .workflow-editor .react-flow__edge.selected .react-flow__edge-path {
+    stroke: var(--primary);
+    stroke-width: 2.25;
+  }
+
+  .workflow-editor .react-flow__edge.workflow-edge-pending .react-flow__edge-path {
+    opacity: 0.35;
+  }
+
+  .workflow-editor .react-flow__edge.workflow-edge-complete .react-flow__edge-path {
+    stroke: color-mix(in oklab, #10b981 80%, var(--foreground));
+    stroke-width: 2.25;
+  }
+
+  .workflow-editor .react-flow__edge.workflow-edge-active .react-flow__edge-path {
+    stroke: var(--primary);
+    stroke-width: 3;
+    opacity: 1;
+  }
+
+  .workflow-editor.workflow-partial-rerun-selecting .react-flow__node {
+    cursor: not-allowed;
+  }
+
+  .workflow-editor.workflow-partial-rerun-selecting
+    .react-flow__node.workflow-node-rerun-candidate {
+    cursor: pointer;
+  }
+
+  .workflow-editor.workflow-partial-rerun-selecting .react-flow__node > * {
+    pointer-events: none;
+  }
+
+  .workflow-editor .react-flow__node.workflow-node-rerun-candidate::after {
+    content: "";
+    position: absolute;
+    inset: -5px;
+    pointer-events: none;
+    border: 2px solid transparent;
+    border-radius: 1rem;
+    transition:
+      border-color 140ms ease-out,
+      box-shadow 140ms ease-out;
+  }
+
+  .workflow-editor .react-flow__node.workflow-node-rerun-candidate:hover::after,
+  .workflow-editor .react-flow__node.workflow-node-rerun-start::after {
+    border-color: color-mix(in oklab, #f59e0b 88%, var(--foreground));
+    box-shadow: 0 0 0 4px color-mix(in oklab, #f59e0b 18%, transparent);
+  }
+
+  .workflow-editor .react-flow__edge.workflow-edge-will-reuse .react-flow__edge-path {
+    stroke: color-mix(in oklab, #10b981 70%, var(--foreground));
+    stroke-width: 2;
+    opacity: 0.45;
+  }
+
+  .workflow-editor .react-flow__edge.workflow-edge-will-rerun .react-flow__edge-path {
+    stroke: color-mix(in oklab, #f59e0b 88%, var(--foreground));
+    stroke-width: 3;
+    opacity: 1;
+  }
+
+  .workflow-editor .react-flow__edge.workflow-edge-preview-unavailable .react-flow__edge-path {
+    opacity: 0.16;
+  }
+
+  .canvas-sweep::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in oklab, var(--foreground) 8%, transparent),
+      transparent
+    );
+    animation: canvas-sweep 1.6s ease-in-out infinite;
+  }
+
+  .agent-message-enter {
+    animation: agent-message-in 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .agent-tool-enter {
+    animation: agent-tool-in 180ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .agent-thinking-live {
+    animation: agent-thinking-breathe 2.4s ease-in-out infinite;
+  }
+
+  .agent-thinking-dot {
+    animation: agent-thinking-dot 1.4s ease-in-out infinite;
+  }
+}
+
+/*
+ * 请求系统减少动态效果的用户，通常是因为动态效果会损害舒适度，或设备性能无法承担。
+ * 两种情况都意味着应完全移除动画，而不是仅缩短时长。
+ */
+@media (prefers-reduced-motion: reduce) {
+  .canvas-panel,
+  .canvas-menu,
+  .canvas-fade-in,
+  .canvas-node,
+  .canvas-node-busy::after,
+  .canvas-sweep::after,
+  .v2-edge-running .react-flow__edge-path {
+    animation: none;
+  }
+
+  .agent-message-enter,
+  .agent-tool-enter,
+  .agent-thinking-live,
+  .agent-thinking-dot {
+    animation: none;
+  }
+}

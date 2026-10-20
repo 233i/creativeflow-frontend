@@ -1,0 +1,11 @@
+node_modules/
+.next/
+test-results/
+playwright-report/
+# 构建上下文不包含任何环境私密文件；正式参数通过 build-arg / env-file 注入。
+.env
+.env.*
+*.env
+**/.env
+**/.env.*
+**/*.env

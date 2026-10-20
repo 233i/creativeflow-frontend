@@ -1,0 +1,74 @@
+name: Frontend
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Frontend quality and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: frontend-quality-${{ github.ref }}
+      cancel-in-progress: true
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+      NEXT_PUBLIC_SITE_URL: http://127.0.0.1:3000
+      SOL_API_ORIGIN: http://127.0.0.1:5298
+      API_BASE_URL: http://127.0.0.1:5298
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - run: npm run verify
+
+  browser:
+    name: Frontend with test API
+    needs: quality
+    # 专用后端由环境提供。没有后端时明确跳过；PR 代码不连接共享测试服务。
+    if: github.event_name != 'pull_request' && vars.SOL_E2E_API_ORIGIN != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: frontend-e2e
+    concurrency:
+      group: frontend-e2e
+      cancel-in-progress: false
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+      NEXT_PUBLIC_SITE_URL: http://127.0.0.1:3000
+      SOL_E2E_BASE_URL: http://127.0.0.1:3000
+      SOL_API_ORIGIN: ${{ vars.SOL_E2E_API_ORIGIN }}
+      API_BASE_URL: ${{ vars.SOL_E2E_API_ORIGIN }}
+      SOL_E2E_EXPECTED_ENVIRONMENT: ${{ vars.SOL_E2E_EXPECTED_ENVIRONMENT || 'Testing' }}
+      SOL_E2E_SERVER: production
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      # Rewrite 在构建时冻结，不能复用 quality 中指向占位地址的产物。
+      - run: npm run build
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        with:
+          name: frontend-browser-report
+          path: output/playwright/e2e/
+          retention-days: 7
+          if-no-files-found: warn

@@ -1,0 +1,82 @@
+/**
+ * CreativeFlow 视觉语义层。
+ * 页面与公共组件只消费语义变量；第三方组件适配在各自样式文件内完成。
+ * 浅色来自已确认的 Studio 设计稿；深色保持相同层级与状态语义。
+ */
+:root {
+  --background: #ffffff;
+  --canvas: #f7f8fa;
+  --foreground: #20232b;
+  --card: #ffffff;
+  --card-foreground: #20232b;
+  --popover: #ffffff;
+  --popover-foreground: #20232b;
+  --primary: #5546e8;
+  --primary-foreground: #ffffff;
+  --secondary: #f1f2f6;
+  --secondary-foreground: #424858;
+  --muted: #f4f5f8;
+  --muted-foreground: #687080;
+  --accent: #efedff;
+  --accent-foreground: #4c3fd0;
+  --destructive: #d53649;
+  --success: #128563;
+  --success-foreground: #ffffff;
+  --warning: #ad6709;
+  --warning-foreground: #ffffff;
+  --border: #e4e7ee;
+  --input: #dce0e8;
+  --ring: #8174ef;
+  --radius: 0.75rem;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #424858;
+  --sidebar-primary: #5546e8;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #efedff;
+  --sidebar-accent-foreground: #4c3fd0;
+  --sidebar-border: #e4e7ee;
+  --sidebar-ring: #8174ef;
+  --chart-1: #5546e8;
+  --chart-2: #128563;
+  --chart-3: #7084b2;
+  --chart-4: #ad6709;
+  --chart-5: #ae648c;
+  --elevation-node: 0 2px 8px rgb(32 35 43 / 6%);
+  --elevation-panel: 0 12px 36px -16px rgb(32 35 43 / 20%), 0 2px 6px rgb(32 35 43 / 4%);
+}
+
+.dark {
+  --background: #151821;
+  --canvas: #11141b;
+  --foreground: #eef0f7;
+  --card: #1c202c;
+  --card-foreground: #eef0f7;
+  --popover: #202432;
+  --popover-foreground: #eef0f7;
+  --primary: #a89bff;
+  --primary-foreground: #201949;
+  --secondary: #282d3c;
+  --secondary-foreground: #d9ddea;
+  --muted: #232836;
+  --muted-foreground: #a3adc2;
+  --accent: #302a4f;
+  --accent-foreground: #c2b9ff;
+  --destructive: #ff8292;
+  --success: #59d5ad;
+  --success-foreground: #092c22;
+  --warning: #efbd6c;
+  --warning-foreground: #33220b;
+  --border: #32394b;
+  --input: #3b4459;
+  --ring: #a89bff;
+  --sidebar: #191d28;
+  --sidebar-foreground: #d9ddea;
+  --sidebar-primary: #a89bff;
+  --sidebar-primary-foreground: #201949;
+  --sidebar-accent: #302a4f;
+  --sidebar-accent-foreground: #c2b9ff;
+  --sidebar-border: #32394b;
+  --sidebar-ring: #a89bff;
+  --elevation-node: 0 2px 8px rgb(0 0 0 / 18%);
+  --elevation-panel: 0 12px 36px -16px rgb(0 0 0 / 45%), 0 2px 6px rgb(0 0 0 / 12%);
+}

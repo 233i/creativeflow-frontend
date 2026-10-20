@@ -1,0 +1,491 @@
+{
+  "capturedAt": "2026-09-28",
+  "baselineCommit": "a1f6d1a",
+  "thresholds": {
+    "complexity": 15,
+    "maxDepth": 4
+  },
+  "note": "这是仍需治理的存量清单，不是已验收为低复杂度。新文件、新函数、复杂度上升或过期例外均失败；禁止为新实现增加例外。P0 原始统计另存 frontend-complexity-baseline.json。",
+  "entries": [
+    {
+      "file": "features/admin/admin-console.tsx",
+      "rule": "complexity",
+      "message": "Function 'AdminConsole' has a complexity of 28. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "admin"
+    },
+    {
+      "file": "features/admin/admin-shell.tsx",
+      "rule": "complexity",
+      "message": "Function 'AdminShell' has a complexity of 17. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "admin"
+    },
+    {
+      "file": "features/admin/admin-shell.tsx",
+      "rule": "complexity",
+      "message": "Function 'escape' has a complexity of 17. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "admin"
+    },
+    {
+      "file": "features/admin/request-history/request-history-panel.tsx",
+      "rule": "complexity",
+      "message": "Function 'RequestHistoryPanel' has a complexity of 51. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "admin"
+    },
+    {
+      "file": "features/admin/workflow-center/delete-dialog.tsx",
+      "rule": "complexity",
+      "message": "Function 'DeleteWorkflowDialog' has a complexity of 20. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "admin"
+    },
+    {
+      "file": "features/admin/workflow-center/import-file.ts",
+      "rule": "complexity",
+      "message": "Function 'importCenterWorkflow' has a complexity of 16. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "admin"
+    },
+    {
+      "file": "features/admin/workflow-center/run-preview.tsx",
+      "rule": "complexity",
+      "message": "Async function 'refresh' has a complexity of 16. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "admin"
+    },
+    {
+      "file": "features/admin/workflow-center/run-records.tsx",
+      "rule": "complexity",
+      "message": "Function 'WorkflowRunRecords' has a complexity of 23. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "admin"
+    },
+    {
+      "file": "features/admin/workflow-center/run-records.tsx",
+      "rule": "complexity",
+      "message": "Function 'HistoricalRun' has a complexity of 16. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "admin"
+    },
+    {
+      "file": "features/admin/workflow-center/settings.tsx",
+      "rule": "complexity",
+      "message": "Function 'WorkflowSettings' has a complexity of 21. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "admin"
+    },
+    {
+      "file": "features/agent/store.ts",
+      "rule": "complexity",
+      "message": "Function 'applyEvent' has a complexity of 29. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "原有状态转换与恢复逻辑不在本次页面控制器拆分范围；后续按状态事件分批治理。",
+      "owner": "agent"
+    },
+    {
+      "file": "features/agent/store.ts",
+      "rule": "complexity",
+      "message": "Async method 'sendPrompt' has a complexity of 19. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "原有状态转换与恢复逻辑不在本次页面控制器拆分范围；后续按状态事件分批治理。",
+      "owner": "agent"
+    },
+    {
+      "file": "features/agent/tools.ts",
+      "rule": "complexity",
+      "message": "Async function 'execute' has a complexity of 95. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "agent"
+    },
+    {
+      "file": "features/agent/tools.ts",
+      "rule": "complexity",
+      "message": "Function 'validateData' has a complexity of 20. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "agent"
+    },
+    {
+      "file": "features/auth/auth-menu.tsx",
+      "rule": "complexity",
+      "message": "Function 'AuthMenu' has a complexity of 24. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "auth"
+    },
+    {
+      "file": "features/canvas/execution.ts",
+      "rule": "complexity",
+      "message": "Async function 'runVideoNode' has a complexity of 17. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "canvas"
+    },
+    {
+      "file": "features/canvas/execution.ts",
+      "rule": "complexity",
+      "message": "Async function 'pollVideoJob' has a complexity of 17. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "canvas"
+    },
+    {
+      "file": "features/canvas/image-jobs.ts",
+      "rule": "complexity",
+      "message": "Function 'applyJob' has a complexity of 34. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "canvas"
+    },
+    {
+      "file": "features/canvas/image-jobs.ts",
+      "rule": "complexity",
+      "message": "Async function 'resumeImageJobs' has a complexity of 17. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "canvas"
+    },
+    {
+      "file": "features/canvas/layout.ts",
+      "rule": "complexity",
+      "message": "Function 'autoLayoutNodes' has a complexity of 22. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "canvas"
+    },
+    {
+      "file": "features/canvas/nodes/image-node.tsx",
+      "rule": "complexity",
+      "message": "Function 'ImageNode' has a complexity of 28. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "canvas"
+    },
+    {
+      "file": "features/canvas/nodes/node-shell.tsx",
+      "rule": "complexity",
+      "message": "Function 'NodeShell' has a complexity of 32. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "canvas"
+    },
+    {
+      "file": "features/canvas/nodes/resize-image-dialog.tsx",
+      "rule": "complexity",
+      "message": "Function 'ResizeImageDialog' has a complexity of 19. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "canvas"
+    },
+    {
+      "file": "features/canvas/nodes/video-gen-node.tsx",
+      "rule": "complexity",
+      "message": "Function 'VideoGenNode' has a complexity of 30. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "canvas"
+    },
+    {
+      "file": "features/canvas/persistence.ts",
+      "rule": "complexity",
+      "message": "Function 'importCanvas' has a complexity of 23. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "canvas"
+    },
+    {
+      "file": "features/canvas/sync.ts",
+      "rule": "complexity",
+      "message": "Async function 'resolveCanvas' has a complexity of 18. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "canvas"
+    },
+    {
+      "file": "features/canvas/text-generation.ts",
+      "rule": "complexity",
+      "message": "Async function 'generateText' has a complexity of 22. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "canvas"
+    },
+    {
+      "file": "features/canvas/upstream.ts",
+      "rule": "complexity",
+      "message": "Function 'collectUpstream' has a complexity of 20. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "canvas"
+    },
+    {
+      "file": "features/knowledge/document-change-dialog.tsx",
+      "rule": "complexity",
+      "message": "Function 'DocumentChangeDialog' has a complexity of 34. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "knowledge"
+    },
+    {
+      "file": "features/knowledge/knowledge-ui.tsx",
+      "rule": "complexity",
+      "message": "Function 'StatusBadge' has a complexity of 19. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "knowledge"
+    },
+    {
+      "file": "features/settings/mcp-import.ts",
+      "rule": "complexity",
+      "message": "Function 'parseMcpConfig' has a complexity of 20. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "settings"
+    },
+    {
+      "file": "features/settings/panels/mcp-panel.tsx",
+      "rule": "complexity",
+      "message": "Function 'McpDetail' has a complexity of 16. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "settings"
+    },
+    {
+      "file": "features/settings/panels/skills-panel.tsx",
+      "rule": "complexity",
+      "message": "Function 'SkillsPanel' has a complexity of 25. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "settings"
+    },
+    {
+      "file": "features/settings/url-config.ts",
+      "rule": "complexity",
+      "message": "Arrow function has a complexity of 37. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "保留分享链接解析的兼容入口及既有契约测试；后续按字段拆分旧解析器。",
+      "owner": "settings"
+    },
+    {
+      "file": "features/workflow/external-api/binding-dialog.tsx",
+      "rule": "complexity",
+      "message": "Function 'WorkflowApiBindingForm' has a complexity of 17. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "workflow"
+    },
+    {
+      "file": "features/workflow/external-api/call-example.ts",
+      "rule": "complexity",
+      "message": "Function 'exampleValue' has a complexity of 30. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "workflow"
+    },
+    {
+      "file": "features/workflow/nodes/node-shell.tsx",
+      "rule": "complexity",
+      "message": "Function 'WorkflowNodeShell' has a complexity of 40. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "workflow"
+    },
+    {
+      "file": "features/workflow/nodes/workflow-nodes.tsx",
+      "rule": "complexity",
+      "message": "Function 'WorkflowVideoGenerateNode' has a complexity of 30. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "workflow"
+    },
+    {
+      "file": "features/workflow/persistence.ts",
+      "rule": "complexity",
+      "message": "Function 'parseGraph' has a complexity of 33. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "workflow"
+    },
+    {
+      "file": "features/workflow/run-progress-panel.tsx",
+      "rule": "complexity",
+      "message": "Function 'WorkflowRunProgressPanel' has a complexity of 27. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "workflow"
+    },
+    {
+      "file": "features/workflow/run-progress-panel.tsx",
+      "rule": "complexity",
+      "message": "Arrow function has a complexity of 19. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "workflow"
+    },
+    {
+      "file": "features/workflow/store.ts",
+      "rule": "complexity",
+      "message": "Arrow function has a complexity of 16. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "原有状态转换与恢复逻辑不在本次页面控制器拆分范围；后续按状态事件分批治理。",
+      "owner": "workflow"
+    },
+    {
+      "file": "features/workflow/template-library-dialog.tsx",
+      "rule": "complexity",
+      "message": "Function 'WorkflowTemplateLibraryDialog' has a complexity of 21. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "workflow"
+    },
+    {
+      "file": "features/workflow/v2/data-task-config.tsx",
+      "rule": "complexity",
+      "message": "Function 'ExpressionEditor' has a complexity of 23. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "保留既有节点配置、校验与运行展示行为；后续按字段和节点职责拆分，不能增加诊断。",
+      "owner": "workflow"
+    },
+    {
+      "file": "features/workflow/v2/data-validation.ts",
+      "rule": "complexity",
+      "message": "Arrow function has a complexity of 64. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "保留既有节点配置、校验与运行展示行为；后续按字段和节点职责拆分，不能增加诊断。",
+      "owner": "workflow"
+    },
+    {
+      "file": "features/workflow/v2/data-validation.ts",
+      "rule": "complexity",
+      "message": "Function 'matchesField' has a complexity of 29. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "保留既有节点配置、校验与运行展示行为；后续按字段和节点职责拆分，不能增加诊断。",
+      "owner": "workflow"
+    },
+    {
+      "file": "features/workflow/v2/data-validation.ts",
+      "rule": "complexity",
+      "message": "Function 'validExpression' has a complexity of 34. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "保留既有节点配置、校验与运行展示行为；后续按字段和节点职责拆分，不能增加诊断。",
+      "owner": "workflow"
+    },
+    {
+      "file": "features/workflow/v2/field-input.tsx",
+      "rule": "complexity",
+      "message": "Function 'FieldInput' has a complexity of 24. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "保留既有节点配置、校验与运行展示行为；后续按字段和节点职责拆分，不能增加诊断。",
+      "owner": "workflow"
+    },
+    {
+      "file": "features/workflow/v2/http-config.tsx",
+      "rule": "complexity",
+      "message": "Function 'HttpRequestConfig' has a complexity of 27. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "保留既有节点配置、校验与运行展示行为；后续按字段和节点职责拆分，不能增加诊断。",
+      "owner": "workflow"
+    },
+    {
+      "file": "features/workflow/v2/http-types.ts",
+      "rule": "complexity",
+      "message": "Function 'httpConfigurationError' has a complexity of 57. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "保留既有节点配置、校验与运行展示行为；后续按字段和节点职责拆分，不能增加诊断。",
+      "owner": "workflow"
+    },
+    {
+      "file": "features/workflow/v2/model-config.tsx",
+      "rule": "complexity",
+      "message": "Function 'ModelConfig' has a complexity of 24. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "保留既有节点配置、校验与运行展示行为；后续按字段和节点职责拆分，不能增加诊断。",
+      "owner": "workflow"
+    },
+    {
+      "file": "features/workflow/v2/node-config.tsx",
+      "rule": "complexity",
+      "message": "Arrow function has a complexity of 32. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "保留既有节点配置、校验与运行展示行为；后续按字段和节点职责拆分，不能增加诊断。",
+      "owner": "workflow"
+    },
+    {
+      "file": "features/workflow/v2/node-debug-panel.tsx",
+      "rule": "complexity",
+      "message": "Function 'NodeDebugPanel' has a complexity of 20. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "保留既有节点配置、校验与运行展示行为；后续按字段和节点职责拆分，不能增加诊断。",
+      "owner": "workflow"
+    },
+    {
+      "file": "features/workflow/v2/run-nodes.tsx",
+      "rule": "complexity",
+      "message": "Arrow function has a complexity of 19. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "保留既有节点配置、校验与运行展示行为；后续按字段和节点职责拆分，不能增加诊断。",
+      "owner": "workflow"
+    },
+    {
+      "file": "features/workflow/v2/run-presentation.ts",
+      "rule": "complexity",
+      "message": "Arrow function has a complexity of 34. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "保留既有节点配置、校验与运行展示行为；后续按字段和节点职责拆分，不能增加诊断。",
+      "owner": "workflow"
+    },
+    {
+      "file": "features/workflow/v2/run-status.tsx",
+      "rule": "complexity",
+      "message": "Function 'V2RunStatus' has a complexity of 17. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "保留既有节点配置、校验与运行展示行为；后续按字段和节点职责拆分，不能增加诊断。",
+      "owner": "workflow"
+    },
+    {
+      "file": "features/workflow/v2/schema-editor.tsx",
+      "rule": "complexity",
+      "message": "Function 'SchemaValueEditor' has a complexity of 21. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "保留既有节点配置、校验与运行展示行为；后续按字段和节点职责拆分，不能增加诊断。",
+      "owner": "workflow"
+    },
+    {
+      "file": "features/workflow/validation.ts",
+      "rule": "complexity",
+      "message": "Function 'targetPort' has a complexity of 16. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "workflow"
+    },
+    {
+      "file": "features/workflow/validation.ts",
+      "rule": "complexity",
+      "message": "Function 'validateWorkflow' has a complexity of 34. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "workflow"
+    },
+    {
+      "file": "features/workflow/video-inputs.ts",
+      "rule": "complexity",
+      "message": "Function 'collect' has a complexity of 16. Maximum allowed is 15.",
+      "count": 1,
+      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
+      "owner": "workflow"
+    }
+  ]
+}
