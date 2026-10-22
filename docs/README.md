@@ -1,5 +1,7 @@
 # 前端文档导航
 
+项目首页：[简体中文](../README.zh-CN.md) · [English](../README.md)。
+
 前端负责网页交互；鉴权、模型调用、队列、知识索引、文件和数据库由
 [后端](https://github.com/233i/creativeflow-backend)负责。
 不要把启动 Next.js 当作启动完整系统。
