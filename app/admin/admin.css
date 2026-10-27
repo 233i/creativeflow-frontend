@@ -151,8 +151,9 @@
   height: var(--workspace-toolbar-height);
   min-height: var(--workspace-toolbar-height);
   gap: 8px;
+  border-bottom: 0;
   padding: 0 12px 0 8px;
-  background: var(--muted);
+  background: var(--canvas);
 }
 .sol-admin-header-tabs {
   display: flex;
@@ -166,6 +167,10 @@
   align-items: center;
   gap: 8px;
   margin-left: auto;
+}
+.sol-admin-header.has-tabs .sol-admin-header-actions {
+  border-left: 1px solid var(--border);
+  padding-left: 12px;
 }
 .sol-admin-header-username {
   max-width: 128px;
@@ -187,6 +192,7 @@
 }
 .sol-admin-content.sol-admin-workspace {
   padding: 0;
+  background: var(--canvas);
 }
 
 .admin-workspace {
@@ -208,6 +214,9 @@
 .admin-workspace-tabbar .t-tabs__content {
   display: none;
 }
+.admin-workspace-tabbar .t-tabs__nav-container::after {
+  display: none;
+}
 .admin-workspace-tabbar .t-tabs__nav {
   /* 组件内联的 48px 最小高度会撑高整个工具栏。 */
   min-height: 0 !important;
@@ -217,15 +226,34 @@
 .admin-workspace-tabbar .t-tabs__btn {
   height: calc(var(--workspace-toolbar-height) - 1px);
 }
+.admin-workspace-tabbar .t-tabs__operations {
+  border-bottom: 0;
+  background: var(--canvas);
+}
+.admin-workspace-tabbar .t-tabs__operations .t-tabs__btn:first-child {
+  background: var(--canvas);
+  box-shadow: none;
+}
 .admin-workspace-tabbar .t-tabs__btn {
   width: 28px;
 }
-.admin-workspace-tabbar .t-tabs__nav-item {
-  height: calc(var(--workspace-toolbar-height) - 1px);
+.admin-workspace-tabbar .t-tabs__nav-item.t-tabs__nav--card {
+  height: calc(var(--workspace-toolbar-height) - 8px);
   min-width: 78px;
   max-width: 232px;
-  border-radius: 0;
+  margin: 4px 4px 4px 0;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding-inline: 12px;
+  background: transparent;
   font-size: 12px;
+}
+.admin-workspace-tabbar .t-tabs__nav-item.t-is-active {
+  border-color: var(--border);
+  background: var(--card);
+}
+.admin-workspace-tabbar .t-tabs__nav-item:not(.t-is-active):hover {
+  background: var(--muted);
 }
 .admin-workspace-tabbar .t-tabs__nav-item-wrapper {
   min-width: 0;
@@ -299,16 +327,41 @@
   min-width: 0;
   min-height: 0;
   overflow: hidden;
+  padding: 8px 12px 12px;
 }
 .admin-workspace-pane[hidden] {
   display: none !important;
 }
-.admin-workspace-pane.is-management {
+.admin-workspace-page-card.t-card {
+  display: flex;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card);
+  box-shadow: none;
+}
+.admin-workspace-page-card.t-card > .t-card__body {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0;
+}
+.admin-workspace-page-card .sol-admin-config-panel > .sol-admin-panel {
   padding: 16px;
 }
 @media (max-width: 640px) {
-  .admin-workspace-pane.is-management {
-    padding: 10px;
+  .admin-workspace-pane {
+    padding: 8px;
+  }
+  .admin-workspace-page-card .sol-admin-config-panel > .sol-admin-panel {
+    padding: 12px;
   }
   .admin-workspace-tab-title {
     max-width: 110px;
@@ -407,6 +460,14 @@
   font-size: 13px;
   line-height: 1.5;
 }
+.sol-admin-template-filters {
+  display: grid;
+  grid-template-columns: minmax(0, 448px) 148px;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0 16px;
+}
 .sol-admin-panel-scroll {
   min-height: 0;
   min-width: 0;
@@ -420,7 +481,7 @@
 
 /* 表格保持原有列、筛选和动作，只降低视觉噪声，不改变业务数据或排序。 */
 .sol-admin-panel .t-table th {
-  background: transparent;
+  background: var(--muted);
   color: var(--muted-foreground);
   font-size: 12px;
   font-weight: 500;
@@ -445,7 +506,10 @@
 }
 .sol-admin-workflow-table .t-table__header th.t-table__cell--fixed-right,
 .sol-admin-workflow-table .t-table__body td.t-table__cell--fixed-right {
-  background: var(--background);
+  background: var(--card);
+}
+.sol-admin-workflow-table .t-table__header th.t-table__cell--fixed-right {
+  background: var(--muted);
 }
 .sol-admin-workflow-table .t-table__cell--fixed-right-first {
   border-left: 1px solid var(--border);
@@ -886,6 +950,7 @@
   }
   .sol-admin-header.has-tabs .sol-admin-header-actions {
     gap: 4px;
+    padding-left: 4px;
   }
   .sol-admin-header.has-tabs .sol-admin-header-username,
   .sol-admin-header.has-tabs .sol-admin-logout-label {
@@ -902,6 +967,9 @@
   .sol-admin-panel-header {
     gap: 8px;
     padding: 0 0 12px;
+  }
+  .sol-admin-template-filters {
+    grid-template-columns: minmax(0, 1fr) 120px;
   }
   .sol-admin-panel-scroll {
     padding: 0;

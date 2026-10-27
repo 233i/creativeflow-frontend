@@ -4,7 +4,15 @@ import { FileUp, MoreHorizontal, Pencil, Plus, Search } from "lucide-react";
 import { Button as MenuButton, Menu, MenuItem, MenuTrigger, Popover } from "react-aria-components";
 import { useWorkspaceRouter as useRouter } from "@/components/providers/workspace-context";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Alert, Button, Input, PrimaryTable, Tag, type PrimaryTableCol } from "tdesign-react";
+import {
+  Alert,
+  Button,
+  Input,
+  PrimaryTable,
+  Select,
+  Tag,
+  type PrimaryTableCol,
+} from "tdesign-react";
 import * as adminApi from "@/features/admin/api";
 import { copyTemplateGraphForApi } from "@/features/admin/workflow-api";
 import { CreateWorkflowDialog, type InitialWorkflow } from "./workflow-center/create-dialog";
@@ -372,7 +380,7 @@ export function WorkflowTemplateManagementPanel() {
   ];
 
   return (
-    <section className="sol-admin-panel">
+    <section className="sol-admin-panel" aria-label="模板运营">
       <header className="sol-admin-panel-header">
         <div>
           <h2 className="text-base font-semibold">模板运营</h2>
@@ -380,36 +388,41 @@ export function WorkflowTemplateManagementPanel() {
             当前返回 {templates.length} 个历史模板 · {categories} 个分类；上架后在前台模板库展示。
           </p>
         </div>
-        <div className="flex flex-wrap items-center justify-end gap-2">
+        <Button
+          theme="primary"
+          icon={<Plus size={16} aria-hidden />}
+          loading={creating}
+          onClick={() => void createTemplate()}
+        >
+          新建模板
+        </Button>
+      </header>
+
+      <div className="sol-admin-template-filters">
+        <label>
+          <span className="sr-only">搜索模板</span>
           <Input
-            className="w-64 max-w-full"
             value={query}
             prefixIcon={<Search size={16} aria-hidden />}
             placeholder="搜索名称、描述或标签"
             clearable
             onChange={(value) => setQuery(String(value))}
           />
-          <select
-            aria-label="模板状态"
-            className="h-8 rounded-md border border-[var(--td-component-border)] bg-[var(--td-bg-color-container)] px-3 text-sm outline-none"
+        </label>
+        <label>
+          <span className="sr-only">模板状态</span>
+          <Select
             value={status}
-            onChange={(event) => setStatus(event.target.value as WorkflowTemplateStatus | "")}
-          >
-            <option value="">全部状态</option>
-            <option value="draft">草稿</option>
-            <option value="published">已发布</option>
-            <option value="archived">已下架</option>
-          </select>
-          <Button
-            theme="primary"
-            icon={<Plus size={16} aria-hidden />}
-            loading={creating}
-            onClick={() => void createTemplate()}
-          >
-            新建模板
-          </Button>
-        </div>
-      </header>
+            options={[
+              { value: "", label: "全部状态" },
+              { value: "draft", label: "草稿" },
+              { value: "published", label: "已发布" },
+              { value: "archived", label: "已下架" },
+            ]}
+            onChange={(value) => setStatus(value as WorkflowTemplateStatus | "")}
+          />
+        </label>
+      </div>
 
       <div className="sol-admin-panel-scroll">
         {error && (

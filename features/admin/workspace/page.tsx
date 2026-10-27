@@ -7,6 +7,7 @@ import {
   type WorkspaceMeta,
 } from "@/components/providers/workspace-context";
 import dynamic from "next/dynamic";
+import { Card } from "tdesign-react";
 import type { WorkspaceTab } from "./location";
 import type { WorkspaceStore } from "./store";
 
@@ -63,11 +64,13 @@ export function AdminWorkspacePage({
         aria-hidden={!active}
         data-workspace-key={tab.key}
       >
-        {tab.kind === "workflow" ? (
-          <WorkflowDetailPage id={tab.id!} source={tab.source!} initialSection={tab.section!} />
-        ) : (
-          <AdminConsole initialTab={tab.menu} />
-        )}
+        <Card className="admin-workspace-page-card" bordered>
+          {tab.kind === "workflow" ? (
+            <WorkflowDetailPage id={tab.id!} source={tab.source!} initialSection={tab.section!} />
+          ) : (
+            <AdminConsole initialTab={tab.menu} />
+          )}
+        </Card>
       </div>
     </WorkspacePageContext.Provider>
   );
