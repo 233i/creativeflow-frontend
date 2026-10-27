@@ -49,27 +49,35 @@
 }
 
 .sol-admin-shell {
+  --admin-frame-gap: 12px;
+  --admin-frame-radius: 6px;
+  --admin-toolbar-height: 40px;
   display: grid;
   grid-template-columns: 200px minmax(0, 1fr);
   height: 100dvh;
   overflow: hidden;
-  background: var(--background);
+  background: var(--canvas);
   color: var(--foreground);
 }
 
 .sol-admin-sidebar {
   display: flex;
+  min-width: 0;
   min-height: 0;
   flex-direction: column;
-  border-right: 1px solid var(--border);
-  background: var(--sidebar);
+  background: var(--canvas);
+}
+.sol-admin-sidebar-card.t-card {
+  flex: 1;
+  margin: 8px 0 var(--admin-frame-gap) var(--admin-frame-gap);
 }
 
 .sol-admin-brand {
   display: flex;
-  height: 48px;
+  height: var(--admin-toolbar-height);
+  flex: none;
   align-items: center;
-  padding: 0 16px;
+  padding: 0 24px;
 }
 .sol-admin-navigation {
   min-height: 0;
@@ -77,11 +85,17 @@
   overflow-y: auto;
   padding: 12px 8px;
 }
+.sol-admin-nav-group {
+  display: grid;
+  gap: 2px;
+}
 .sol-admin-nav-group + .sol-admin-nav-group {
-  margin-top: 20px;
+  margin-top: 12px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
 }
 .sol-admin-nav-label {
-  margin: 0 12px 10px;
+  margin: 0 10px 6px;
   color: var(--muted-foreground);
   font-size: 12px;
 }
@@ -90,13 +104,15 @@
   width: 100%;
   align-items: center;
   gap: 10px;
-  margin: 2px 0;
-  border-radius: 8px;
+  margin: 0;
+  border: 1px solid transparent;
+  border-radius: 4px;
   min-height: 36px;
-  padding: 8px 12px;
-  color: var(--sidebar-foreground);
+  padding: 7px 10px;
+  color: var(--muted-foreground);
   text-align: left;
-  font-size: 14px;
+  font-size: 13px;
+  line-height: 20px;
   transition:
     background-color 120ms,
     color 120ms;
@@ -106,9 +122,10 @@
   color: var(--foreground);
 }
 .sol-admin-nav-item.is-active {
-  background: var(--sidebar-accent);
-  color: var(--sidebar-accent-foreground);
-  font-weight: 600;
+  border-color: var(--border);
+  background: var(--card);
+  color: var(--primary);
+  font-weight: 500;
 }
 .sol-admin-nav-item:focus-visible,
 .sol-admin-return:focus-visible {
@@ -117,17 +134,27 @@
 }
 .sol-admin-return {
   display: flex;
+  min-height: 36px;
   align-items: center;
   gap: 10px;
-  margin: 12px;
-  border-radius: 8px;
-  padding: 12px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 7px 10px;
   font-size: 13px;
+  line-height: 20px;
   color: var(--muted-foreground);
 }
 .sol-admin-return:hover {
   background: var(--muted);
   color: var(--foreground);
+}
+.sol-admin-sidebar-footer {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 2px;
+  border-top: 1px solid var(--border);
+  padding: 8px;
 }
 .sol-admin-main {
   display: flex;
@@ -138,7 +165,8 @@
 }
 .sol-admin-header {
   display: flex;
-  min-height: 48px;
+  height: var(--admin-toolbar-height);
+  min-height: var(--admin-toolbar-height);
   flex: none;
   align-items: center;
   justify-content: space-between;
@@ -327,23 +355,27 @@
   min-width: 0;
   min-height: 0;
   overflow: hidden;
-  padding: 8px 12px 12px;
+  padding: 8px var(--admin-frame-gap) var(--admin-frame-gap);
 }
 .admin-workspace-pane[hidden] {
   display: none !important;
 }
+.sol-admin-sidebar-card.t-card,
 .admin-workspace-page-card.t-card {
   display: flex;
-  height: 100%;
   min-width: 0;
   min-height: 0;
   flex-direction: column;
   overflow: hidden;
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: var(--admin-frame-radius);
   background: var(--card);
   box-shadow: none;
 }
+.admin-workspace-page-card.t-card {
+  height: 100%;
+}
+.sol-admin-sidebar-card.t-card > .t-card__body,
 .admin-workspace-page-card.t-card > .t-card__body {
   display: flex;
   min-width: 0;
@@ -622,21 +654,27 @@
 }
 
 .sol-admin-sidebar-toggle {
-  width: calc(100% - 16px);
-  margin: 0 8px;
+  width: 100%;
 }
 .sol-admin-shell.is-collapsed {
   grid-template-columns: 56px minmax(0, 1fr);
 }
 .sol-admin-shell.is-collapsed .sol-admin-brand {
-  padding: 0 12px;
+  padding: 0 10px 0 18px;
   overflow: hidden;
 }
-.sol-admin-shell.is-collapsed .sol-admin-brand span,
 .sol-admin-shell.is-collapsed .sol-admin-nav-label,
 .sol-admin-shell.is-collapsed .sol-admin-nav-item span,
 .sol-admin-shell.is-collapsed .sol-admin-return span {
   display: none;
+}
+.sol-admin-shell.is-collapsed .sol-admin-sidebar-card {
+  margin-left: 8px;
+}
+.sol-admin-shell.is-collapsed .sol-admin-navigation,
+.sol-admin-shell.is-collapsed .sol-admin-sidebar-footer {
+  padding-right: 4px;
+  padding-left: 4px;
 }
 .sol-admin-shell.is-collapsed .sol-admin-nav-item {
   justify-content: center;
@@ -645,7 +683,6 @@
 .sol-admin-shell.is-collapsed .sol-admin-return {
   justify-content: center;
   padding: 8px;
-  margin: 8px;
 }
 .sol-admin-mobile-menu,
 .sol-admin-mobile-close,
@@ -879,6 +916,9 @@
 }
 
 @media (max-width: 800px) {
+  .sol-admin-shell {
+    --admin-toolbar-height: 44px;
+  }
   .sol-admin-shell button,
   .sol-admin-shell .sol-admin-control,
   #v2-inspector button {
@@ -908,7 +948,18 @@
     z-index: 80;
     box-shadow: var(--elevation-panel);
   }
-  .sol-admin-shell.is-mobile-open .sol-admin-brand span,
+  .sol-admin-shell.is-mobile-open .sol-admin-brand {
+    padding: 0 16px;
+  }
+  .sol-admin-shell.is-mobile-open .sol-admin-sidebar-card {
+    margin-right: 12px;
+    margin-left: 12px;
+  }
+  .sol-admin-shell.is-mobile-open .sol-admin-navigation,
+  .sol-admin-shell.is-mobile-open .sol-admin-sidebar-footer {
+    padding-right: 8px;
+    padding-left: 8px;
+  }
   .sol-admin-shell.is-mobile-open .sol-admin-nav-label,
   .sol-admin-shell.is-mobile-open .sol-admin-nav-item span,
   .sol-admin-shell.is-mobile-open .sol-admin-return span {
@@ -917,6 +968,11 @@
   .sol-admin-shell.is-mobile-open .sol-admin-nav-item {
     justify-content: flex-start;
     padding: 12px;
+  }
+  .sol-admin-shell.is-mobile-open .sol-admin-return {
+    min-height: 44px;
+    justify-content: flex-start;
+    padding: 7px 10px;
   }
   .sol-admin-shell.is-mobile-open .sol-admin-sidebar-toggle {
     display: none;

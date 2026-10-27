@@ -7,14 +7,6 @@
   "note": "这是 check:complexity 使用的存量清单，不代表已验收为低复杂度。新文件、新函数、复杂度上升或过期例外均失败；禁止为新实现增加例外。",
   "entries": [
     {
-      "file": "features/admin/admin-shell.tsx",
-      "rule": "complexity",
-      "message": "Function 'escape' has a complexity of 17. Maximum allowed is 15.",
-      "count": 1,
-      "reason": "本轮主页面拆分以外的既有辅助模块；后续在修改该功能时按职责拆分，保留行为回归。",
-      "owner": "admin"
-    },
-    {
       "file": "features/admin/request-history/request-history-panel.tsx",
       "rule": "complexity",
       "message": "Function 'RequestHistoryPanel' has a complexity of 51. Maximum allowed is 15.",
