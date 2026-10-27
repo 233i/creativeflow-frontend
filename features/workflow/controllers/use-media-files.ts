@@ -4,7 +4,7 @@ import { useRef } from "react";
 import { useReactFlow } from "@xyflow/react";
 import { useT } from "@/components/providers/i18n-provider";
 import { exportWorkflow, importWorkflow, MAX_WORKFLOW_FILE_BYTES } from "../persistence";
-import { useWorkflowStore } from "../store";
+import { useWorkflowStoreApi } from "../store";
 import { downloadJson } from "@/lib/download";
 import type { WorkflowEditorSource } from "./editor-types";
 import type { WorkflowDocumentSession } from "./use-workflow-document";
@@ -19,6 +19,7 @@ export function useMediaFiles(
   clearIssues: () => void,
 ) {
   const t = useT();
+  const storeApi = useWorkflowStoreApi();
   const { fitView } = useReactFlow();
   const inputRef = useRef<HTMLInputElement>(null);
   const capture = useRequestScope(source.id);
@@ -37,7 +38,7 @@ export function useMediaFiles(
         session.setError(t("workflow.importFailed", { detail: result.detail }));
         return;
       }
-      useWorkflowStore.getState().load(result.graph);
+      storeApi.getState().load(result.graph);
       clearIssues();
       if (!(await draft.save()) || !current()) return;
       window.requestAnimationFrame(() => {
@@ -50,7 +51,7 @@ export function useMediaFiles(
   }
   function exportFile() {
     if (!session.document) return;
-    const { nodes, edges, externalApi } = useWorkflowStore.getState();
+    const { nodes, edges, externalApi } = storeApi.getState();
     downloadJson(
       `creativeflow-${source.kind === "template" ? "template" : "workflow"}-${source.id.slice(0, 8)}.json`,
       exportWorkflow(session.document.name, { nodes, edges, externalApi }),

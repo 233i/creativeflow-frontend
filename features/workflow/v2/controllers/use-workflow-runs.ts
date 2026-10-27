@@ -53,6 +53,7 @@ export function useWorkflowRuns(
     workflowId,
     runId: run?.id ?? null,
     interval: active || knowledgeRun ? 1500 : admin ? 10000 : null,
+    backgroundRunning: active,
     onResult: (value) => {
       setRun(value);
       setConnectionError(null);
@@ -65,6 +66,7 @@ export function useWorkflowRuns(
     workflowId,
     runId: debugRun?.id ?? null,
     interval: debugActive ? 1500 : 10000,
+    backgroundRunning: debugActive,
     onResult: (value) => {
       setDebugRun(value);
       setClock(Date.now());

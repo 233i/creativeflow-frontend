@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { RefreshCw } from "lucide-react";
+import { useWorkspaceActive } from "@/components/providers/workspace-context";
 import { Button } from "@/components/ui/button";
 import type { ManagedUser } from "@/features/admin/api";
 import { useAdminQuery } from "../admin-query";
@@ -17,6 +18,7 @@ import { formatTime, kindLabel, RequestDetailView, RequestStatus } from "./reque
 
 /** 统一运行查看入口；原记录类型和无法关联工作流的历史记录仍可独立检索。 */
 export function RequestHistoryPanel({ initialUser }: { initialUser?: ManagedUser | null }) {
+  const active = useWorkspaceActive();
   const [params, update] = useAdminQuery();
   const [legacyUser, setLegacyUser] = useState(initialUser?.id ?? "");
   const source: RequestSource = params.get("recordSource") === "workflow" ? "workflow" : "canvas";
@@ -49,6 +51,7 @@ export function RequestHistoryPanel({ initialUser }: { initialUser?: ManagedUser
     if (legacyUser && !params.has("accountId")) update({ accountId: legacyUser });
   }, [legacyUser, params, update]);
   useEffect(() => {
+    if (!active) return;
     let current = true;
     const timer = window.setTimeout(() => {
       setPending(key);
@@ -82,7 +85,7 @@ export function RequestHistoryPanel({ initialUser }: { initialUser?: ManagedUser
       current = false;
       window.clearTimeout(timer);
     };
-  }, [key, refresh, update]);
+  }, [key, refresh, update, active]);
   useEffect(() => {
     if (page && scroll.current)
       try {

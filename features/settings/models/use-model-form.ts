@@ -12,6 +12,31 @@ import {
 import { INHERIT } from "@/features/settings/models/model-form-options";
 import { useState } from "react";
 import { modelCapabilitiesDraft } from "./model-capabilities-draft";
+import { useWorkspaceGuard } from "@/components/providers/workspace-context";
+
+function initialFormValues(model: AiModel | null) {
+  const capabilities = modelCapabilitiesDraft(model);
+  return [
+    model?.modelKey ?? "",
+    model?.name ?? "",
+    model?.category ?? "chat",
+    model?.type ?? INHERIT,
+    model?.contextLength?.toString() ?? "",
+    model?.maxOutputTokens?.toString() ?? "",
+    capabilities.supportsVision,
+    capabilities.supportsFunctionCall,
+    capabilities.supportsThinking,
+  ];
+}
+
+function useModelFormGuard(
+  open: boolean,
+  dirty: boolean,
+  busy: boolean,
+  save: () => Promise<boolean>,
+) {
+  useWorkspaceGuard({ dirty: open && dirty, busy: open && busy, save });
+}
 
 export function useModelForm({
   isOpen,
@@ -51,7 +76,7 @@ export function useModelForm({
   const allowedProtocols = PROTOCOLS_BY_CATEGORY[category];
 
   async function save() {
-    if (!modelKey.trim() || busy) return;
+    if (!modelKey.trim() || busy) return false;
 
     setBusy(true);
     setError(null);
@@ -88,12 +113,28 @@ export function useModelForm({
       }
 
       onOpenChange(false);
+      return true;
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : t("errors.unknown"));
+      return false;
     } finally {
       setBusy(false);
     }
   }
+
+  const dirty =
+    JSON.stringify([
+      modelKey,
+      name,
+      category,
+      type,
+      contextLength,
+      maxOutputTokens,
+      supportsVision,
+      supportsFunctionCall,
+      supportsThinking,
+    ]) !== JSON.stringify(initialFormValues(model));
+  useModelFormGuard(isOpen, dirty, busy, save);
 
   return {
     isOpen,

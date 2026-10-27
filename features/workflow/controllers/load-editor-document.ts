@@ -8,6 +8,7 @@ interface Environment {
   current: () => boolean;
   loadAi: () => Promise<unknown>;
   refreshAdminAi: () => Promise<unknown>;
+  adminVerified?: boolean;
 }
 type Loaded = {
   document: WorkflowEditorDocument;
@@ -46,9 +47,10 @@ async function loadTemplate(
   environment: Environment,
 ): Promise<EditorLoadResult> {
   await handshake();
-  await environment.refreshAdminAi().catch(() => {
-    /* Model settings must not block structural editing. */
-  });
+  if (!environment.adminVerified)
+    await environment.refreshAdminAi().catch(() => {
+      /* Model settings must not block structural editing. */
+    });
   if (!environment.current()) return null;
   const template = await adminApi.getWorkflowTemplate(id);
   if (!environment.current()) return null;
@@ -69,15 +71,17 @@ export async function loadEditorDocument(
   environment: Environment,
 ): Promise<EditorLoadResult> {
   if (source.kind !== "workflow") {
-    const me = await adminApi.getMe();
-    if (!environment.current()) return null;
-    if (!me.admin)
-      return {
-        redirect:
-          source.kind === "api" ? "/admin?tab=workflowApis" : "/admin?tab=workflowTemplates",
-      };
+    if (!environment.adminVerified) {
+      const me = await adminApi.getMe();
+      if (!environment.current()) return null;
+      if (!me.admin)
+        return {
+          redirect:
+            source.kind === "api" ? "/admin?tab=workflowApis" : "/admin?tab=workflowTemplates",
+        };
+    }
     if (source.kind === "template") return loadTemplate(source.id, client, environment);
-    await environment.refreshAdminAi().catch(() => {});
+    if (!environment.adminVerified) await environment.refreshAdminAi().catch(() => {});
   } else {
     if (!storedDeviceId()) await handshake();
     await environment.loadAi();

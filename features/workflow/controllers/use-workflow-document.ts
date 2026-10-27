@@ -1,6 +1,9 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import {
+  useWorkspacePage,
+  useWorkspaceRouter as useRouter,
+} from "@/components/providers/workspace-context";
 import { useReactFlow } from "@xyflow/react";
 import { useT } from "@/components/providers/i18n-provider";
 import * as api from "../api";
@@ -14,6 +17,7 @@ import { loadEditorDocument } from "./load-editor-document";
 export function useWorkflowDocument(source: WorkflowEditorSource, workflowApi: WorkflowClient) {
   const t = useT();
   const router = useRouter();
+  const adminVerified = !!useWorkspacePage();
   const { fitView } = useReactFlow();
   const load = useWorkflowStore((state) => state.load);
   const setRun = useWorkflowStore((state) => state.setRun);
@@ -40,6 +44,7 @@ export function useWorkflowDocument(source: WorkflowEditorSource, workflowApi: W
           current: () => !cancelled,
           loadAi,
           refreshAdminAi,
+          adminVerified,
         });
         if (cancelled || !loaded) return;
         if ("redirect" in loaded) {
@@ -83,7 +88,18 @@ export function useWorkflowDocument(source: WorkflowEditorSource, workflowApi: W
       cancelled = true;
       hydratedRef.current = false;
     };
-  }, [fitView, load, loadAi, refreshAdminAi, router, setRun, source, t, workflowApi]);
+  }, [
+    adminVerified,
+    fitView,
+    load,
+    loadAi,
+    refreshAdminAi,
+    router,
+    setRun,
+    source,
+    t,
+    workflowApi,
+  ]);
 
   return {
     document,

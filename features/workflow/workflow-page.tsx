@@ -12,6 +12,7 @@ import type { WorkflowEditorSource } from "./controllers/editor-types";
 import { useWorkflowDocument } from "./controllers/use-workflow-document";
 import { WorkflowV2Editor } from "./v2/editor";
 import { MediaEditor } from "./components/media-editor";
+import { WorkflowStoreProvider } from "./store";
 export function WorkflowPage({ workflowId }: { workflowId: string }) {
   const source = useMemo<WorkflowEditorSource>(
     () => ({ kind: "workflow", id: workflowId }),
@@ -19,7 +20,9 @@ export function WorkflowPage({ workflowId }: { workflowId: string }) {
   );
   return (
     <ReactFlowProvider>
-      <WorkflowEditor key={workflowId} source={source} />
+      <WorkflowStoreProvider key={workflowId}>
+        <WorkflowEditor source={source} />
+      </WorkflowStoreProvider>
     </ReactFlowProvider>
   );
 }
@@ -31,7 +34,9 @@ export function WorkflowTemplateEditorPage({ templateId }: { templateId: string 
   );
   return (
     <ReactFlowProvider>
-      <WorkflowEditor key={templateId} source={source} />
+      <WorkflowStoreProvider key={templateId}>
+        <WorkflowEditor source={source} />
+      </WorkflowStoreProvider>
     </ReactFlowProvider>
   );
 }
@@ -52,7 +57,9 @@ export function WorkflowApiEditorPage({ workflowId }: { workflowId: string }) {
   return (
     <WorkflowEditorEnvironmentContext.Provider value={environment}>
       <ReactFlowProvider>
-        <WorkflowEditor key={workflowId} source={source} />
+        <WorkflowStoreProvider key={workflowId}>
+          <WorkflowEditor source={source} />
+        </WorkflowStoreProvider>
       </ReactFlowProvider>
     </WorkflowEditorEnvironmentContext.Provider>
   );

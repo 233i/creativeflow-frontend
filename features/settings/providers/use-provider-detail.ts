@@ -6,6 +6,7 @@ import { useAiStore } from "@/features/ai/store";
 import { type AiProvider, normalizeBaseUrl } from "@/features/ai/types";
 import { useMemo, useState } from "react";
 import { useProviderCommands } from "./use-provider-commands";
+import { useWorkspaceGuard } from "@/components/providers/workspace-context";
 
 export function useProviderDetail(provider: AiProvider) {
   const t = useT();
@@ -60,6 +61,24 @@ export function useProviderDetail(provider: AiProvider) {
       setBaseUrl(normalized);
     }
   }
+
+  useWorkspaceGuard({
+    dirty: !!apiKeyDraft || normalizeBaseUrl(baseUrl, provider.type) !== provider.baseUrl,
+    busy: saving || checking || fetching,
+    save: async () => {
+      const normalized = normalizeBaseUrl(baseUrl, provider.type);
+      const ok = await saveProvider({
+        baseUrl: normalized,
+        ...(apiKeyDraft ? { apiKey: apiKeyDraft } : {}),
+      });
+      if (ok) {
+        setBaseUrl(normalized);
+        setApiKeyDraft("");
+        setShowKey(false);
+      }
+      return ok;
+    },
+  });
 
   async function runCheck() {
     setChecking(true);

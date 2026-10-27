@@ -3,11 +3,21 @@ import { Background, BackgroundVariant, Controls, MiniMap, ReactFlow } from "@xy
 import { Loader2, MousePointer2 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useT } from "@/components/providers/i18n-provider";
+import { useWorkflowCanvasActive } from "../editor-session";
 import { WorkflowPartialRerunPreviewProvider } from "../partial-rerun-preview";
 import { NODE_TYPES, PRO_OPTIONS, FIT_VIEW_OPTIONS, DELETE_KEYS } from "./media-node-types";
 import type { MediaEditorModel } from "../controllers/use-media-editor";
 export function MediaCanvas({ editor, managed }: { editor: MediaEditorModel; managed: boolean }) {
   const t = useT();
+  const pageActive = useWorkflowCanvasActive();
+  const keyboard = pageActive
+    ? {}
+    : {
+        selectionKeyCode: null,
+        multiSelectionKeyCode: null,
+        panActivationKeyCode: null,
+        zoomActivationKeyCode: null,
+      };
   const { resolvedTheme } = useTheme();
   const { onNodesChange, onEdgesChange, onConnect, isValidConnection } = editor.canvas;
   const { displayNodes, displayEdges, nodeColour } = editor.presentation;
@@ -30,6 +40,7 @@ export function MediaCanvas({ editor, managed }: { editor: MediaEditorModel; man
           }
         >
           <ReactFlow
+            id={`media-${editor.source.kind}-${editor.source.id}`}
             nodes={displayNodes}
             edges={displayEdges}
             nodeTypes={NODE_TYPES}
@@ -41,7 +52,8 @@ export function MediaCanvas({ editor, managed }: { editor: MediaEditorModel; man
               else if (managed) editor.panels.inspectNode(node.id);
             }}
             isValidConnection={isValidConnection}
-            deleteKeyCode={partialRerunSelecting ? null : DELETE_KEYS}
+            deleteKeyCode={!pageActive || partialRerunSelecting ? null : DELETE_KEYS}
+            {...keyboard}
             nodesConnectable={!partialRerunSelecting}
             nodesDraggable={!partialRerunSelecting}
             fitView

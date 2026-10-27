@@ -21,6 +21,16 @@ function environment() {
 }
 
 describe("editor source loading", () => {
+  it("reuses the workspace session while still reading the authorized admin document endpoint", async () => {
+    const { document, client } = controllerFixture();
+    const env = { ...environment(), adminVerified: true };
+    expect(await loadEditorDocument({ kind: "api", id: document.id }, client, env)).toMatchObject({
+      document,
+    });
+    expect(admin.getMe).not.toHaveBeenCalled();
+    expect(env.refreshAdminAi).not.toHaveBeenCalled();
+    expect(client.getWorkflow).toHaveBeenCalledWith(document.id);
+  });
   it("redirects a non-admin without reading or preparing a document", async () => {
     const { client } = controllerFixture();
     vi.mocked(admin.getMe).mockResolvedValue({ admin: null, isAuthenticated: false });

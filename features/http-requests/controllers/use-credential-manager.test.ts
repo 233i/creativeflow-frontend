@@ -63,7 +63,7 @@ describe("credential form controller", () => {
     );
     const hook = renderHook(() => useCredentialManager({ onClose: vi.fn() }));
     await act(async () => {});
-    let pending!: Promise<void>;
+    let pending!: Promise<boolean>;
     act(() => {
       pending = hook.result.current.save();
       void hook.result.current.save();

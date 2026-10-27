@@ -32,7 +32,7 @@ import {
 } from "@/features/ai/video-models";
 import { WorkflowNodeShell } from "@/features/workflow/nodes/node-shell";
 import { WorkflowVideoFrames } from "@/features/workflow/nodes/workflow-video-frames";
-import { useWorkflowStore } from "@/features/workflow/store";
+import { useWorkflowStore, useWorkflowStoreApi } from "@/features/workflow/store";
 import {
   WORKFLOW_ASPECTS,
   VIDEO_EXTENSION_DURATION_DEFAULT,
@@ -107,6 +107,7 @@ export function WorkflowTextNode({ id, data, selected }: NodeProps) {
 }
 
 export function WorkflowImageNode({ id, data, selected }: NodeProps) {
+  const storeApi = useWorkflowStoreApi();
   const t = useT();
   const { uploadAsset, assetUrl, assets } = useWorkflowEditorEnvironment();
   const update = useWorkflowStore((state) => state.updateNodeData);
@@ -126,8 +127,7 @@ export function WorkflowImageNode({ id, data, selected }: NodeProps) {
   }, []);
 
   function applyAsset(asset: { url: string; mediaType: string }) {
-    if (!mounted.current || !useWorkflowStore.getState().nodes.some((node) => node.id === id))
-      return;
+    if (!mounted.current || !storeApi.getState().nodes.some((node) => node.id === id)) return;
     // 只更新当前节点的图片字段，保留连线、位置及 API 参数绑定；素材库路径不走上传。
     update(id, { assetUrl: asset.url, mediaType: asset.mediaType });
     setError(null);

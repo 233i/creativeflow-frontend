@@ -25,6 +25,7 @@ import { useAiStore } from "@/features/ai/store";
 import { normalizeBaseUrl, PROVIDER_TYPES, type ProviderType } from "@/features/ai/types";
 import { FormField } from "@/features/settings/panels/panel-shell";
 import { cn } from "@/lib/utils";
+import { useWorkspaceGuard } from "@/components/providers/workspace-context";
 
 /**
  * 从内置预设或空白配置添加供应商。
@@ -51,6 +52,11 @@ export function AddProviderDialog({
   const [type, setType] = useState<ProviderType>("openai-chat");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  useWorkspaceGuard({
+    dirty: isOpen && (!!name || !!baseUrl),
+    busy: isOpen && busy,
+    message: "请在原页面确认新建渠道，关闭页签会放弃尚未确认的输入。",
+  });
 
   const takenBuiltinIds = new Set(providers.map((p) => p.builtinId).filter(Boolean));
   const takenNames = new Set(providers.map((p) => p.name.toLowerCase()));

@@ -9,6 +9,7 @@ import {
   type KnowledgeVersion,
 } from "@/features/knowledge/api";
 import { useRef, useState } from "react";
+import { useWorkspaceGuard } from "@/components/providers/workspace-context";
 
 export function useKnowledgeImportPanel({
   libraryId,
@@ -35,6 +36,14 @@ export function useKnowledgeImportPanel({
   const [busy, setBusy] = useState(false);
   const [dragging, setDragging] = useState(false);
   const lockRef = useRef(false);
+  useWorkspaceGuard({
+    dirty: !receipt && documents.length > 0,
+    busy,
+    message:
+      !receipt && documents.length
+        ? "文档导入尚未确认，关闭将清空已选择的文件；不会自动提交向量化任务。"
+        : undefined,
+  });
   const validParameters =
     Number.isInteger(chunkSize) &&
     chunkSize >= 200 &&

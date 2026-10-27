@@ -51,7 +51,21 @@ npm run verify
 
 浏览器至少验证成功、失败恢复、权限失效以及刷新后的持久状态。发布 API 要额外检查已发布版本固定、Key 吊销、历史读取和 SSE 断线重连；前端 mock 验收与真实后端验收分别记录。
 
-## 新增管理表单
+## 后台多页签工作区
+
+`app/admin/layout.tsx` 持有统一工作区，`features/admin/workspace/` 负责路由身份、页签顺序、缓存、共享管理员会话及关闭保护。菜单每类一个页签；工作流按来源和 ID 分开，详情中的编排、发布、运行、权限、设置复用同一个工作流页签。工作流中心固定在首位。最多打开 20 页，不会挤掉未保存草稿；恢复的隐藏页签首次激活才挂载。
+
+页内跳转使用 `useWorkspaceRouter` 或 `WorkspacePage.navigate`，筛选使用 `useAdminQuery`，不要直接读取其他页签当前的 `window.location`。需要手动同步 URL 时使用 `updateLocation`；隐藏页签的异步清理只能更新自己的地址。系统内切换保留筛选、分页、滚动、画布视口、草稿和运行面板。浏览器前进后退同步当前页签；刷新重新读取服务端已保存数据，不恢复内存草稿。
+
+新增有修改或写入操作的页面必须调用 `useWorkspaceGuard`，提供 `dirty`、`busy` 和可选的 `save(): Promise<boolean>`。只有确实保存成功才能返回 `true`；失败必须保留输入。资源创建、发布、授权、删除等不能作为自动保存动作。页签关闭、批量关闭、刷新、退出共用此保护；浏览器关闭和刷新会对所有隐藏页签的修改提醒。页面局部弹窗还须在隐藏时关闭门户显示，同时保留输入状态。
+
+媒体工作流的 Zustand store 由 `WorkflowStoreProvider` 按编辑器实例创建；控制器通过 `useWorkflowStoreApi` 读取当前实例，禁止用全局 store 读取另一画布。两种编辑器都按 `useWorkflowCanvasActive` 停用隐藏页面的全局画布快捷键；新增 DOM ID 使用 `useWorkspaceElementId`，React Flow 实例设置独立 ID。运行任务关闭后仍由后端执行；后台只降低查询频率，重新打开只查询已有任务，不能再次提交。返回缓存工作流时复验删除和可访问状态，不覆盖未保存画布。
+
+sessionStorage 按管理员账户隔离，只保留页签地址、标题、类型说明和筛选，不保存密钥、工作流输入、草稿或运行正文。退出或管理员会话失效会卸载全部页面并清理该账户的页签记录；网络故障不主动丢弃草稿。
+
+必需复验：两个媒体画布和两个编排画布草稿隔离、保存失败后取消关闭、批量关闭、拖动与键盘切换、列表筛选与返回、前进后退、刷新恢复、窄屏溢出、运行中切换及关闭后恢复、删除后返回、退出与会话失效。`features/admin/workspace/` 与工作流控制器测试覆盖状态隔离、路由和运行查询；浏览器替身验证只代表前端行为，不替代真实后端和模型验收。
+
+## 管理表单实现
 
 页面入口组装功能控制器和展示组件。可参考 `features/http-requests/controllers/use-credential-manager.ts`、`features/settings/providers/use-provider-commands.ts` 及各自 `components/`。表单草稿、读取生命周期、写命令和展示各有归属；权限由管理容器提供，功能组件通过显式接口使用。
 

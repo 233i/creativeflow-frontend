@@ -5,6 +5,7 @@ import type { WorkflowActions } from "../controllers/use-workflow-actions";
 import type { V2InspectorMode } from "../inspector";
 import { Activity, ArrowLeft, Code2, Play, Save, Square } from "lucide-react";
 import { actionClass } from "../config-styles";
+import { useWorkspaceElementId } from "@/components/providers/workspace-context";
 export function V2EditorToolbar({
   draft,
   runs,
@@ -35,6 +36,9 @@ export function V2EditorToolbar({
   const { document, graph, dirty } = draft;
   const { run, active, debugActive } = runs;
   const { busy } = actions;
+  const detailsId = useWorkspaceElementId("v2-run-details-trigger");
+  const triggerId = useWorkspaceElementId("v2-run-trigger");
+  const inspectorId = useWorkspaceElementId("v2-inspector");
   const selected = graph.nodes.find((node) => node.id === selectedId);
   return (
     <header className="flex shrink-0 flex-wrap items-center gap-3 border-b px-4 py-3">
@@ -62,11 +66,11 @@ export function V2EditorToolbar({
         运行历史
       </button>
       <button
-        id="v2-run-details-trigger"
+        id={detailsId}
         className={`${actionClass} ${inspector === "run" ? "border-primary/30 bg-primary/5 text-primary" : ""}`}
         disabled={!run}
         aria-expanded={inspector === "run"}
-        aria-controls="v2-inspector"
+        aria-controls={inspectorId}
         onClick={() => onInspector(inspector === "run" ? null : "run")}
       >
         <Activity className="mr-1 inline size-3.5" />
@@ -100,7 +104,7 @@ export function V2EditorToolbar({
         </button>
       )}
       <button
-        id="v2-run-trigger"
+        id={triggerId}
         className={`${actionClass} bg-primary text-primary-foreground hover:bg-primary/90`}
         disabled={busy || active || debugActive}
         onClick={onExecute}

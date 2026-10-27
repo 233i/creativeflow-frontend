@@ -9,6 +9,7 @@ import { createStarterWorkflow } from "@/features/workflow/template";
 import { createV2Workflow } from "@/features/workflow/v2/types";
 import { isTypedWorkflowGraph, type WorkflowGraph } from "@/features/workflow/types";
 import type { WorkflowDocument } from "@/features/workflow/api";
+import { useWorkspaceGuard } from "@/components/providers/workspace-context";
 
 export interface InitialWorkflow {
   name: string;
@@ -35,6 +36,11 @@ export function CreateWorkflowDialog({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const lock = useRef(false);
+  useWorkspaceGuard({
+    dirty: !!name.trim() || !!initial,
+    busy,
+    message: "工作流尚未创建，关闭将放弃填写或导入的内容。",
+  });
   function close() {
     if (!busy && (!name.trim() || window.confirm("尚未创建工作流，放弃已填写的内容？"))) onClose();
   }

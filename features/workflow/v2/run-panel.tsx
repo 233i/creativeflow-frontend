@@ -18,6 +18,7 @@ import { V2RunStatus } from "./run-status";
 import { V2OverallProgress } from "./run-progress";
 import type { WorkflowV2Graph } from "./types";
 import { V2ModelCalls } from "./model-calls";
+import { useWorkspaceElementId } from "@/components/providers/workspace-context";
 
 const tabs = ["steps", "calls", "output"] as const;
 
@@ -46,6 +47,7 @@ export function V2RunPanel({
   onRollback?: (id: string) => void;
 }) {
   const [tab, setTab] = useState<(typeof tabs)[number]>("steps");
+  const idPrefix = useWorkspaceElementId("v2-run");
   const summary = runSummary(run);
   const outputs = run.nodes.filter(
     (node) =>
@@ -109,8 +111,8 @@ export function V2RunPanel({
               key={value}
               type="button"
               role="tab"
-              id={`v2-run-${value}-tab`}
-              aria-controls={`v2-run-${value}`}
+              id={`${idPrefix}-${value}-tab`}
+              aria-controls={`${idPrefix}-${value}`}
               aria-selected={tab === value}
               tabIndex={tab === value ? 0 : -1}
               onClick={() => setTab(value)}
@@ -128,7 +130,7 @@ export function V2RunPanel({
                               tabs.length
                           ];
                   setTab(next);
-                  document.getElementById(`v2-run-${next}-tab`)?.focus();
+                  document.getElementById(`${idPrefix}-${next}-tab`)?.focus();
                 }
               }}
               className={cn(
@@ -146,8 +148,8 @@ export function V2RunPanel({
       </div>
       <div
         role="tabpanel"
-        id={`v2-run-${tab}`}
-        aria-labelledby={`v2-run-${tab}-tab`}
+        id={`${idPrefix}-${tab}`}
+        aria-labelledby={`${idPrefix}-${tab}-tab`}
         tabIndex={0}
         className="pt-4 outline-none"
       >

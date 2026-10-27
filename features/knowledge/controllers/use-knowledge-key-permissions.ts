@@ -3,6 +3,7 @@ import { listWorkflowApis, type ManagedWorkflowApi } from "@/features/admin/work
 import { knowledgeAccessApi, type KnowledgeGrants } from "@/features/knowledge/access-api";
 import { listApiKeys, type WorkflowApiKey } from "@/features/workflow/external-api/api";
 import { useEffect, useRef, useState } from "react";
+import { useWorkspaceGuard } from "@/components/providers/workspace-context";
 
 export function useKnowledgeKeyPermissions({ libraryId }: { libraryId: string }) {
   const [workflows, setWorkflows] = useState<ManagedWorkflowApi[]>([]);
@@ -18,6 +19,11 @@ export function useKnowledgeKeyPermissions({ libraryId }: { libraryId: string })
   const [loadingKeys, setLoadingKeys] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const lockRef = useRef(false);
+  useWorkspaceGuard({
+    dirty: !!keyId || !!reason || !!pending,
+    busy,
+    message: "知识库 API Key 授权尚未确认，关闭将放弃输入。",
+  });
   const aliveRef = useRef(true);
   useEffect(() => {
     let disposed = false;

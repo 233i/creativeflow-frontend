@@ -7,6 +7,7 @@ import {
   type HttpCredentialSummary,
 } from "@/features/http-requests/credentials-api";
 import { useEffect, useRef, useState } from "react";
+import { useWorkspaceActive, useWorkspaceGuard } from "@/components/providers/workspace-context";
 
 export function useCredentialManager({
   onClose,
@@ -20,6 +21,7 @@ export function useCredentialManager({
   initialScope?: { method: string; url: string };
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const active = useWorkspaceActive();
   const lockRef = useRef(false);
   const [list, setList] = useState<HttpCredentialSummary[]>([]);
   const [id, setId] = useState(initialId);
@@ -42,11 +44,14 @@ export function useCredentialManager({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState("");
+  const [baseline, setBaseline] = useState(() => JSON.stringify(form));
+  useWorkspaceGuard({ dirty: !loading && JSON.stringify(form) !== baseline, busy, save });
   useEffect(() => {
     const element = dialogRef.current;
-    element?.showModal();
+    if (active) element?.showModal();
+    else element?.close();
     return () => element?.close();
-  }, []);
+  }, [active]);
   useEffect(() => {
     let disposed = false;
     void credentialApi
@@ -70,14 +75,16 @@ export function useCredentialManager({
         if (disposed) return;
         const revision = value.revisions.find((item) => item.id === value.currentRevision);
         setDetail(value);
-        setForm({
+        const next = {
           name: value.name,
           description: value.description,
           origin: revision?.definition.origin ?? "",
           headers:
             revision?.definition.headers.map((name) => ({ name, value: "" })) ?? empty().headers,
           requests: revision?.definition.requests ?? [],
-        });
+        };
+        setBaseline(JSON.stringify(next));
+        setForm(next);
         setLoading(false);
       })
       .catch((cause) => {
@@ -91,17 +98,16 @@ export function useCredentialManager({
     };
   }, [id, refresh]);
   async function save() {
-    if (lockRef.current) return;
+    if (lockRef.current) return false;
     lockRef.current = true;
     setBusy(true);
     setError(null);
     setMessage("");
     try {
       const saved = await credentialApi.save(id || null, form);
-      setForm((value) => ({
-        ...value,
-        headers: value.headers.map((row) => ({ ...row, value: "" })),
-      }));
+      const cleared = { ...form, headers: form.headers.map((row) => ({ ...row, value: "" })) };
+      setBaseline(JSON.stringify(cleared));
+      setForm(cleared);
       setId(saved.id);
       setRefresh((value) => value + 1);
       setMessage(
@@ -110,8 +116,10 @@ export function useCredentialManager({
           : "凭据版本已保存。已发布工作流仍使用原版本。",
       );
       onSaved?.(saved.id, saved.revisionId);
+      return true;
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "保存失败，请重试。");
+      return false;
     } finally {
       lockRef.current = false;
       setBusy(false);

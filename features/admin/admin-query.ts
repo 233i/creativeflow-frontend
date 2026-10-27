@@ -1,36 +1,50 @@
 "use client";
 
 import { useCallback, useMemo, useSyncExternalStore } from "react";
+import { useWorkspacePage } from "@/components/providers/workspace-context";
 
 const changed = "creativeflow:admin-query";
 
 /** 查询状态仅包含公开筛选条件，支持刷新及浏览器前进/后退，不保存执行参数。 */
 export function useAdminQuery() {
-  const subscribe = useCallback((listener: () => void) => {
-    window.addEventListener("popstate", listener);
-    window.addEventListener(changed, listener);
-    return () => {
-      window.removeEventListener("popstate", listener);
-      window.removeEventListener(changed, listener);
-    };
-  }, []);
+  const page = useWorkspacePage();
+  const subscribe = useCallback(
+    (listener: () => void) => {
+      if (page) return () => {};
+      window.addEventListener("popstate", listener);
+      window.addEventListener(changed, listener);
+      return () => {
+        window.removeEventListener("popstate", listener);
+        window.removeEventListener(changed, listener);
+      };
+    },
+    [page],
+  );
   const value = useSyncExternalStore(
     subscribe,
-    () => window.location.search,
+    () => (page ? new URL(page.href, "http://workspace.local").search : window.location.search),
     () => "",
   );
   const query = useMemo(() => new URLSearchParams(value), [value]);
-  const update = useCallback((values: Record<string, string | null>, push = false) => {
-    const next = new URLSearchParams(window.location.search);
-    for (const [key, value] of Object.entries(values)) {
-      if (value) next.set(key, value);
-      else next.delete(key);
-    }
-    const url = window.location.pathname + (next.size ? `?${next}` : "");
-    if (push) window.history.pushState(window.history.state, "", url);
-    else window.history.replaceState(window.history.state, "", url);
-    window.dispatchEvent(new Event(changed));
-  }, []);
+  const update = useCallback(
+    (values: Record<string, string | null>, push = false) => {
+      const location = new URL(page?.href ?? window.location.href, window.location.origin);
+      const next = new URLSearchParams(location.search);
+      for (const [key, value] of Object.entries(values)) {
+        if (value) next.set(key, value);
+        else next.delete(key);
+      }
+      const url = location.pathname + (next.size ? `?${next}` : "");
+      if (page) {
+        page.updateLocation(url, push);
+        return;
+      }
+      if (push) window.history.pushState(window.history.state, "", url);
+      else window.history.replaceState(window.history.state, "", url);
+      window.dispatchEvent(new Event(changed));
+    },
+    [page],
+  );
   return [query, update] as const;
 }
 

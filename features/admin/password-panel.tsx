@@ -3,6 +3,7 @@
 import { Alert, Button, Card, Form, Input, Space, type SubmitContext } from "tdesign-react";
 import { useState } from "react";
 import * as adminApi from "@/features/admin/api";
+import { useWorkspaceGuard } from "@/components/providers/workspace-context";
 
 interface PasswordFormData {
   currentPassword: string;
@@ -30,6 +31,7 @@ export function PasswordPanel({
 }) {
   const [form] = Form.useForm();
   const [submitting, setSubmitting] = useState(false);
+  const [dirty, setDirty] = useState(false);
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
   async function submit({ validateResult }: SubmitContext) {
@@ -41,6 +43,7 @@ export function PasswordPanel({
     try {
       await adminApi.changePassword(values.currentPassword, values.newPassword);
       form.reset({ type: "empty" });
+      setDirty(false);
       setMessage({ ok: true, text: "管理员密码已更新，请使用新密码登录。" });
       onChanged();
     } catch (reason) {
@@ -49,6 +52,12 @@ export function PasswordPanel({
       setSubmitting(false);
     }
   }
+
+  useWorkspaceGuard({
+    dirty,
+    busy: submitting,
+    message: dirty ? "密码输入只保存在当前页签，请在原页面确认修改。" : undefined,
+  });
 
   return (
     <section className="sol-admin-panel">
@@ -94,6 +103,7 @@ export function PasswordPanel({
               ],
             }}
             onSubmit={(context) => void submit(context)}
+            onValuesChange={(_, values) => setDirty(Object.values(values).some(Boolean))}
           >
             <input
               className="sr-only"

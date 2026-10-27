@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useWorkspaceRouter as useRouter } from "@/components/providers/workspace-context";
 import * as adminApi from "@/features/admin/api";
 import type { WorkflowEditorSource } from "./editor-types";
 import type { MediaDraft } from "./use-media-draft";

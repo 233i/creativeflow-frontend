@@ -1,26 +1,30 @@
 "use client";
 import { useAdminQuery, workflowReturnUrl } from "@/features/admin/admin-query";
-import * as adminApi from "@/features/admin/api";
 import { type CenterItem } from "@/features/admin/workflow-center/api";
 import { type EditorSession } from "@/features/admin/workflow-center/detail-context";
 import type { WorkflowDocument } from "@/features/workflow/api";
 import type { WorkflowTemplateDocument } from "@/features/workflow/templates-api";
-import { useRouter } from "next/navigation";
+import { useWorkspaceRouter as useRouter } from "@/components/providers/workspace-context";
 import { useRef, useState, useSyncExternalStore } from "react";
 import { detailSection, subscribe } from "../detail-location";
 import type { WorkflowDetailProps } from "../detail-types";
+import { useAdminSession } from "../../workspace/session";
+import { useWorkspacePage } from "@/components/providers/workspace-context";
 export function useDetailState({ id, source, initialSection }: WorkflowDetailProps) {
+  const workspace = useWorkspacePage();
+  const { identity, setIdentity, checking } = useAdminSession();
   const router = useRouter();
   const [params] = useAdminQuery();
   const returnHref = workflowReturnUrl(params.get("returnTo"));
   const path = useSyncExternalStore(
     subscribe,
-    () => window.location.pathname,
+    () =>
+      workspace
+        ? new URL(workspace.href, "http://workspace.local").pathname
+        : window.location.pathname,
     () => `/admin/workflows/${id}/${initialSection}`,
   );
   const section = detailSection(path.split("/").filter(Boolean)[3]);
-  const [identity, setIdentity] = useState<adminApi.AdminIdentity | null>(null);
-  const [checking, setChecking] = useState(true);
   const [document, setDocument] = useState<WorkflowDocument | WorkflowTemplateDocument | null>(
     null,
   );
@@ -54,7 +58,6 @@ export function useDetailState({ id, source, initialSection }: WorkflowDetailPro
     identity,
     setIdentity,
     checking,
-    setChecking,
     document,
     setDocument,
     item,

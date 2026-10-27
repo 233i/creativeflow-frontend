@@ -2,6 +2,7 @@
 import { listUsers, type ManagedUser } from "@/features/admin/api";
 import { knowledgeAccessApi, type KnowledgeGrants } from "@/features/knowledge/access-api";
 import { useEffect, useRef, useState } from "react";
+import { useWorkspaceGuard } from "@/components/providers/workspace-context";
 
 export function useKnowledgePermissionsPanel({ libraryId }: { libraryId: string }) {
   const [data, setData] = useState<KnowledgeGrants | null>(null);
@@ -16,6 +17,11 @@ export function useKnowledgePermissionsPanel({ libraryId }: { libraryId: string 
   const [busy, setBusy] = useState(false);
   const [keyMode, setKeyMode] = useState(false);
   const lockRef = useRef(false);
+  useWorkspaceGuard({
+    dirty: !!account || !!reason || !!pending,
+    busy,
+    message: "知识库账号授权尚未确认，关闭将放弃输入。",
+  });
   const aliveRef = useRef(true);
   const searchSequenceRef = useRef(0);
   useEffect(() => {

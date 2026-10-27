@@ -15,6 +15,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { XIcon } from "lucide-react";
+import { useWorkspaceActive } from "@/components/providers/workspace-context";
 
 function DialogTrigger({ ...props }: DialogTriggerPrimitiveProps) {
   return <DialogTriggerPrimitive data-slot="dialog-trigger" {...props} />;
@@ -46,6 +47,7 @@ function DialogOverlay({
   className?: string;
   children: React.ReactNode;
 }) {
+  const active = useWorkspaceActive();
   return (
     <ModalOverlayPrimitive
       data-slot="dialog-overlay"
@@ -54,6 +56,7 @@ function DialogOverlay({
         className,
       )}
       {...props}
+      isOpen={active ? props.isOpen : false}
     >
       {children}
     </ModalOverlayPrimitive>

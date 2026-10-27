@@ -11,6 +11,7 @@ import { executionEdges } from "../run-presentation";
 import { InitialGraphFit } from "../../initial-graph-fit";
 import { V2NodeLibrary } from "../node-library";
 import { V2RunProgress } from "../run-progress";
+import { useWorkflowCanvasActive } from "../../editor-session";
 const nodeTypes = {
   start: V2NodeCard,
   llm: V2NodeCard,
@@ -54,6 +55,7 @@ export function V2EditorCanvas({
   onOpenRun: () => void;
 }) {
   const { graph } = draft;
+  const pageActive = useWorkflowCanvasActive();
   const { run, debugRun, debugActive, clock } = runs;
   return (
     <div
@@ -76,6 +78,7 @@ export function V2EditorCanvas({
       <V2RunContext.Provider value={inspector === "debug" ? null : run}>
         <V2DebugContext.Provider value={inspector === "debug" ? debugRun : null}>
           <ReactFlow<WorkflowV2Node>
+            id={`orchestration-${draft.document.id}`}
             nodes={graph.nodes}
             edges={executionEdges(graph, inspector === "debug" ? null : run)}
             nodeTypes={nodeTypes}
@@ -89,7 +92,11 @@ export function V2EditorCanvas({
             onNodeClick={(_, node) => onSelect(node.id)}
             nodesDraggable={!busy}
             nodesConnectable={!busy}
-            deleteKeyCode={busy ? null : ["Backspace", "Delete"]}
+            deleteKeyCode={!pageActive || busy ? null : ["Backspace", "Delete"]}
+            selectionKeyCode={pageActive ? undefined : null}
+            multiSelectionKeyCode={pageActive ? undefined : null}
+            panActivationKeyCode={pageActive ? undefined : null}
+            zoomActivationKeyCode={pageActive ? undefined : null}
             minZoom={0.2}
             maxZoom={1.5}
             proOptions={{ hideAttribution: true }}

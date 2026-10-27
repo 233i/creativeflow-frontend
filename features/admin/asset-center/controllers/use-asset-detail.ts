@@ -6,6 +6,7 @@ import { assetError, parseAssetTags } from "@/features/assets/commands";
 import type { AssetDetail } from "@/features/assets/types";
 import { useCommandLock } from "@/lib/hooks/use-command-lock";
 import { useRequestScope } from "@/lib/hooks/use-request-scope";
+import { useWorkspaceGuard } from "@/components/providers/workspace-context";
 
 export function useAssetDetail(
   id: string,
@@ -24,6 +25,12 @@ export function useAssetDetail(
   const [tags, setTags] = useState("");
   const [reason, setReason] = useState("");
   const detail = data?.request === request ? data.detail : null;
+  useWorkspaceGuard({
+    dirty:
+      !!detail && (name !== detail.asset.name || tags !== detail.asset.tags.join(", ") || !!reason),
+    busy: lock.pending !== null,
+    save,
+  });
   useEffect(() => {
     let disposed = false;
     const abort = new AbortController();
@@ -56,9 +63,9 @@ export function useAssetDetail(
     }
   }
   async function save() {
-    if (!detail || detail.asset.state !== "active" || !name.trim() || !reason.trim()) return;
+    if (!detail || detail.asset.state !== "active" || !name.trim() || !reason.trim()) return false;
     const lease = lock.acquire("save");
-    if (!lease) return;
+    if (!lease) return false;
     const current = capture();
     setError("");
     try {
@@ -71,9 +78,12 @@ export function useAssetDetail(
       if (current()) {
         setReason("");
         onChanged("资产信息已保存。");
+        return true;
       }
+      return false;
     } catch (cause) {
       if (current()) setError(assetError(cause, "保存未完成，请重新查询。"));
+      return false;
     } finally {
       lease.release();
     }

@@ -6,6 +6,7 @@ import {
   type KnowledgeQuotas,
 } from "@/features/knowledge/api";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useWorkspaceActive, useWorkspaceGuard } from "@/components/providers/workspace-context";
 
 export function useKnowledgeDetailPanel({
   id,
@@ -25,6 +26,8 @@ export function useKnowledgeDetailPanel({
   const [detail, setDetail] = useState<KnowledgeDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const active = useWorkspaceActive();
+  useWorkspaceGuard({ dirty: false, busy });
   const [tab, setTab] = useState("documents");
   const [documentVersion, setDocumentVersion] = useState<string | null>(null);
   const [importOpen, setImportOpen] = useState(false);
@@ -43,11 +46,17 @@ export function useKnowledgeDetailPanel({
   }, [id]);
   useEffect(() => {
     aliveRef.current = true;
+    return () => {
+      aliveRef.current = false;
+    };
+  }, []);
+  useEffect(() => {
+    if (!active) return;
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout>;
     const poll = async () => {
       try {
-        if (!lockRef.current) await load();
+        if (!lockRef.current && document.visibilityState !== "hidden") await load();
       } catch (reason) {
         if (!cancelled) setError(reason instanceof Error ? reason.message : "查询失败");
       }
@@ -56,10 +65,9 @@ export function useKnowledgeDetailPanel({
     void poll();
     return () => {
       cancelled = true;
-      aliveRef.current = false;
       clearTimeout(timer);
     };
-  }, [load]);
+  }, [load, active]);
 
   async function run(action: () => Promise<void>) {
     if (lockRef.current) return false;

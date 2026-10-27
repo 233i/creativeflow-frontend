@@ -11,6 +11,7 @@ import {
 import { resolveProtocol, type AiModel, type AiProvider } from "@/features/ai/types";
 import { message } from "@/features/settings/models/embedding-errors";
 import { useEffect, useRef, useState } from "react";
+import { useWorkspaceGuard } from "@/components/providers/workspace-context";
 
 export function useEmbeddingModel({
   provider,
@@ -51,7 +52,8 @@ export function useEmbeddingModel({
     };
   }, [model.id]);
 
-  const dirty = JSON.stringify(draft) !== JSON.stringify(saved?.settings);
+  const dirty = !!draft && !!saved && JSON.stringify(draft) !== JSON.stringify(saved.settings);
+  useWorkspaceGuard({ dirty, busy, save });
   const protocolReady = resolveProtocol(provider, model) === "openai-embeddings";
   const texts = inputs
     .split(/\r?\n/)
@@ -74,7 +76,7 @@ export function useEmbeddingModel({
   }
 
   async function save() {
-    if (!draft || busy) return;
+    if (!draft || busy) return false;
     setBusy(true);
     setError(null);
     setResult(null);
@@ -82,8 +84,10 @@ export function useEmbeddingModel({
       const value = await saveEmbeddingSettings(model.id, draft);
       setSaved(value);
       setDraft(value.settings);
+      return true;
     } catch (failure) {
       setError(message(failure));
+      return false;
     } finally {
       setBusy(false);
     }

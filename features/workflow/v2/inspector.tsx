@@ -4,6 +4,7 @@ import { useEffect, useSyncExternalStore, type ReactNode } from "react";
 import { Activity, SlidersHorizontal, X } from "lucide-react";
 import { Dialog } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { useWorkspaceElementId } from "@/components/providers/workspace-context";
 
 export type V2InspectorMode = "node" | "run" | "input" | "debug";
 const query = "(max-width: 639px)";
@@ -34,6 +35,9 @@ export function V2Inspector({
   children: ReactNode;
 }) {
   const mobile = useSyncExternalStore(subscribeMobile, mobileSnapshot, () => false);
+  const detailsId = useWorkspaceElementId("v2-run-details-trigger");
+  const triggerId = useWorkspaceElementId("v2-run-trigger");
+  const inspectorId = useWorkspaceElementId("v2-inspector");
   useEffect(() => {
     const previous =
       document.activeElement instanceof HTMLElement && document.activeElement !== document.body
@@ -44,12 +48,11 @@ export function V2Inspector({
         const trigger =
           previous?.isConnected && !previous.closest('[data-slot="dialog-overlay"]')
             ? previous
-            : (document.getElementById("v2-run-details-trigger") ??
-              document.getElementById("v2-run-trigger"));
+            : (document.getElementById(detailsId) ?? document.getElementById(triggerId));
         trigger?.focus();
       });
     };
-  }, []);
+  }, [detailsId, triggerId]);
   const label =
     mode === "input"
       ? "运行输入"
@@ -59,7 +62,7 @@ export function V2Inspector({
           ? "执行详情"
           : "节点配置";
   const content = (
-    <div id="v2-inspector" className="flex h-full min-h-0 flex-col">
+    <div id={inspectorId} className="flex h-full min-h-0 flex-col">
       <header className="flex shrink-0 items-center justify-between gap-2 border-b p-3">
         {mode === "input" || mode === "debug" ? (
           <h2 className="text-sm font-semibold">{label}</h2>

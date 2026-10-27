@@ -3,6 +3,7 @@ import { listUsers, type ManagedUser } from "@/features/admin/api";
 import type { CredentialGrant, CredentialGrants } from "@/features/http-requests/credentials-api";
 import { credentialApi } from "@/features/http-requests/credentials-api";
 import { useEffect, useRef, useState } from "react";
+import { useWorkspaceGuard } from "@/components/providers/workspace-context";
 
 export function useCredentialAccess({ id }: { id: string }) {
   const [data, setData] = useState<CredentialGrants | null>(null);
@@ -19,6 +20,11 @@ export function useCredentialAccess({ id }: { id: string }) {
   const [error, setError] = useState<string | null>(null);
   const [refresh, setRefresh] = useState(0);
   const lockRef = useRef(false);
+  useWorkspaceGuard({
+    dirty: !!subject || !!reason || !!pending,
+    busy,
+    message: "凭据授权尚未确认，请在原页面确认授权；关闭会放弃输入。",
+  });
   useEffect(() => {
     let disposed = false;
     void credentialApi

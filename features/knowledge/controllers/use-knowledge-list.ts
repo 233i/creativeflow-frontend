@@ -7,8 +7,10 @@ import {
   type KnowledgeLibrary,
 } from "@/features/knowledge/api";
 import { useCallback, useEffect, useState } from "react";
+import { useWorkspaceActive } from "@/components/providers/workspace-context";
 
 export function useKnowledgePanel() {
+  const active = useWorkspaceActive();
   const providers = useAiStore((state) => state.providers);
   const allModels = providers.flatMap((provider) =>
     provider.models.map((model) => ({
@@ -33,6 +35,7 @@ export function useKnowledgePanel() {
   const load = useCallback(async () => setLibraries(await knowledgeApi.list()), []);
 
   useEffect(() => {
+    if (!active) return;
     let cancelled = false;
     void knowledgeApi
       .capabilities()
@@ -57,7 +60,7 @@ export function useKnowledgePanel() {
     return () => {
       cancelled = true;
     };
-  }, [retry]);
+  }, [retry, active]);
 
   const activeCount = libraries.filter(
     (library) => library.enabled && library.activeVersion,

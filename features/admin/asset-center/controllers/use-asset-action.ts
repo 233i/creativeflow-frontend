@@ -5,6 +5,7 @@ import { manageAsset, previewAssetDeletion } from "@/features/assets/api";
 import { assetActionAllowed, assetError } from "@/features/assets/commands";
 import type { AssetActionKind, AssetDeletionPreview, AssetItem } from "@/features/assets/types";
 import { useCommandLock } from "@/lib/hooks/use-command-lock";
+import { useWorkspaceGuard } from "@/components/providers/workspace-context";
 
 export function useAssetAction(
   asset: AssetItem,
@@ -18,6 +19,11 @@ export function useAssetAction(
   const [name, setName] = useState("");
   const [history, setHistory] = useState(false);
   const lock = useCommandLock<"submit">(`${asset.id}:${action}`);
+  useWorkspaceGuard({
+    dirty: !!reason || !!name || history,
+    busy: lock.pending !== null,
+    message: "资产操作尚未确认，关闭将放弃输入；不会自动执行资产操作。",
+  });
   useEffect(() => {
     let disposed = false;
     const abort = new AbortController();

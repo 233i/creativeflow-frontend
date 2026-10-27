@@ -22,6 +22,27 @@ function sentHeaders(): Headers {
 }
 
 describe("API transport", () => {
+  it.each([
+    ["/api/v1/admin", "/workflow-center", 401, true],
+    ["/api/v1", "/admin/ai/providers", 401, true],
+    ["/api/v1", "/auth/me", 401, false],
+    ["/api/v1/admin", "/workflow-center", 403, false],
+  ])(
+    "notifies the shared admin session only for an admin 401: %s%s %s",
+    async (baseUrl, path, status, expected) => {
+      fetchMock.mockResolvedValue(Response.json({ error: "unauthorized" }, { status }));
+      const listener = vi.fn();
+      window.addEventListener("creativeflow:admin-session-expired", listener);
+      const adminRequest = createApiClient({ baseUrl, createError: () => new Error("denied") });
+      try {
+        await expect(adminRequest(path)).rejects.toThrow("denied");
+        expect(listener).toHaveBeenCalledTimes(expected ? 1 : 0);
+      } finally {
+        window.removeEventListener("creativeflow:admin-session-expired", listener);
+      }
+    },
+  );
+
   it("sends JSON with session cookies and preserves request options", async () => {
     const controller = new AbortController();
     const body = JSON.stringify({ name: "example" });

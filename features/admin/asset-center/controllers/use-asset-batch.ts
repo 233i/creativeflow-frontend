@@ -5,6 +5,7 @@ import { batchAssets } from "@/features/assets/api";
 import { assetBatchRequest, assetError } from "@/features/assets/commands";
 import type { AssetItem, AssetBatchKind, AssetResult } from "@/features/assets/types";
 import { useCommandLock } from "@/lib/hooks/use-command-lock";
+import { useWorkspaceGuard } from "@/components/providers/workspace-context";
 
 export function useAssetBatch(
   assets: AssetItem[],
@@ -18,6 +19,11 @@ export function useAssetBatch(
   const lock = useCommandLock<"batch">(
     JSON.stringify([action, assets.map((asset) => [asset.id, asset.revision])]),
   );
+  useWorkspaceGuard({
+    dirty: !!reason || !!value || confirmed,
+    busy: lock.pending !== null,
+    message: "资产批量操作尚未确认，关闭将放弃输入。",
+  });
   async function submit() {
     if (!assets.length || !confirmed || !reason.trim() || error) return;
     const lease = lock.acquire("batch");

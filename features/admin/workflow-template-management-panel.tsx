@@ -2,17 +2,9 @@
 
 import { FileUp, MoreHorizontal, Pencil, Plus, Search } from "lucide-react";
 import { Button as MenuButton, Menu, MenuItem, MenuTrigger, Popover } from "react-aria-components";
-import { useRouter } from "next/navigation";
+import { useWorkspaceRouter as useRouter } from "@/components/providers/workspace-context";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  Alert,
-  Button,
-  Dialog,
-  Input,
-  PrimaryTable,
-  Tag,
-  type PrimaryTableCol,
-} from "tdesign-react";
+import { Alert, Button, Input, PrimaryTable, Tag, type PrimaryTableCol } from "tdesign-react";
 import * as adminApi from "@/features/admin/api";
 import { copyTemplateGraphForApi } from "@/features/admin/workflow-api";
 import { CreateWorkflowDialog, type InitialWorkflow } from "./workflow-center/create-dialog";
@@ -26,6 +18,8 @@ import type {
   WorkflowTemplateSummary,
 } from "@/features/workflow/templates-api";
 import type { WorkflowGraph } from "@/features/workflow/types";
+import { ManagementDialog as Dialog } from "@/components/ui/management-dialog";
+import { useWorkspaceGuard } from "@/components/providers/workspace-context";
 
 const dateFormatter = new Intl.DateTimeFormat("zh-CN", {
   dateStyle: "medium",
@@ -45,6 +39,14 @@ interface TemplateEditor {
   sourceFileName: string | null;
 }
 
+function useTemplateWorkspace(editor: TemplateEditor | null, busy: boolean) {
+  useWorkspaceGuard({
+    dirty: !!editor && editor.status !== "published",
+    busy,
+    message: "模板参数尚未保存，请在原页面确认后再关闭。",
+  });
+}
+
 export function WorkflowTemplateManagementPanel() {
   const router = useRouter();
   const [templates, setTemplates] = useState<WorkflowTemplateSummary[]>([]);
@@ -59,6 +61,7 @@ export function WorkflowTemplateManagementPanel() {
   const [creating, setCreating] = useState(false);
   const [pendingDelete, setPendingDelete] = useState<WorkflowTemplateSummary | null>(null);
   const [copySource, setCopySource] = useState<InitialWorkflow>();
+  useTemplateWorkspace(editor, [saving, creating, pendingId !== null].some(Boolean));
 
   const load = useCallback(async (search: string, nextStatus: WorkflowTemplateStatus | "") => {
     setLoading(true);
@@ -98,16 +101,17 @@ export function WorkflowTemplateManagementPanel() {
         isFeatured: false,
         sortOrder: 0,
       });
-      router.push(`/admin/workflow-templates/${encodeURIComponent(created.id)}/edit`);
+      router.push(`/admin/workflows/${encodeURIComponent(created.id)}/edit?source=template`);
     } catch (reason) {
       setError(apiErrorMessage(reason, "新建模板失败"));
+    } finally {
       setCreating(false);
     }
   }
 
   async function openTemplate(template: WorkflowTemplateSummary) {
     if (template.status !== "published") {
-      router.push(`/admin/workflow-templates/${encodeURIComponent(template.id)}/edit`);
+      router.push(`/admin/workflows/${encodeURIComponent(template.id)}/edit?source=template`);
       return;
     }
     setPendingId(template.id);

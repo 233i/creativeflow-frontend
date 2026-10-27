@@ -8,10 +8,13 @@ import {
   type CenterPage,
 } from "@/features/admin/workflow-center/api";
 import { WorkflowApiError } from "@/features/workflow/api";
-import { useRouter } from "next/navigation";
+import { useWorkspaceRouter as useRouter } from "@/components/providers/workspace-context";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useWorkspaceActive, useWorkspacePage } from "@/components/providers/workspace-context";
 
 export function useCenterQuery(defaultView: string) {
+  const workspace = useWorkspacePage();
+  const active = useWorkspaceActive();
   const router = useRouter();
   const [params, update] = useAdminQuery();
   const query = useMemo(() => readCenterQuery(params, defaultView), [params, defaultView]);
@@ -26,9 +29,11 @@ export function useCenterQuery(defaultView: string) {
   const page = data?.key === queryKey ? data.page : null;
   const currentPage = Math.floor(query.offset / query.limit) + 1;
   const returnUrl = workflowReturnUrl(
-    typeof window === "undefined" ? null : window.location.pathname + window.location.search,
+    workspace?.href ??
+      (typeof window === "undefined" ? null : window.location.pathname + window.location.search),
   );
   useEffect(() => {
+    if (!active) return;
     let disposed = false;
     void editorApi
       .getWorkflowCapabilities()
@@ -41,9 +46,10 @@ export function useCenterQuery(defaultView: string) {
     return () => {
       disposed = true;
     };
-  }, [refresh]);
+  }, [refresh, active]);
 
   useEffect(() => {
+    if (!active) return;
     const abort = new AbortController();
     let disposed = false;
     const timer = window.setTimeout(() => {
@@ -70,7 +76,7 @@ export function useCenterQuery(defaultView: string) {
       abort.abort();
       window.clearTimeout(timer);
     };
-  }, [queryKey, refresh]);
+  }, [queryKey, refresh, active]);
 
   useEffect(() => {
     if (!page || !scrollRef.current) return;

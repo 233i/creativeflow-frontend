@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useWorkspaceGuard } from "@/components/providers/workspace-context";
 import { Alert, Button, Card, Loading, RadioGroup, Space } from "tdesign-react";
 import {
   AiApiError,
@@ -20,6 +21,7 @@ function errorMessage(reason: unknown): string {
 
 export function ImageGenerationSettingsPanel() {
   const [responseFormat, setResponseFormat] = useState<ImageResponseFormat>("url");
+  const [savedFormat, setSavedFormat] = useState<ImageResponseFormat>("url");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -31,6 +33,7 @@ export function ImageGenerationSettingsPanel() {
     try {
       const settings = await getImageGenerationSettings();
       setResponseFormat(settings.responseFormat);
+      setSavedFormat(settings.responseFormat);
     } catch (reason) {
       setLoadError(errorMessage(reason));
     } finally {
@@ -43,7 +46,10 @@ export function ImageGenerationSettingsPanel() {
     void getImageGenerationSettings()
       .then(
         (settings) => {
-          if (!cancelled) setResponseFormat(settings.responseFormat);
+          if (!cancelled) {
+            setResponseFormat(settings.responseFormat);
+            setSavedFormat(settings.responseFormat);
+          }
         },
         (reason: unknown) => {
           if (!cancelled) setLoadError(errorMessage(reason));
@@ -64,13 +70,18 @@ export function ImageGenerationSettingsPanel() {
     try {
       const settings = await updateImageGenerationSettings(responseFormat);
       setResponseFormat(settings.responseFormat);
+      setSavedFormat(settings.responseFormat);
       setMessage({ ok: true, text: "图片返回类型已更新，后续生成任务将立即使用新设置。" });
+      return true;
     } catch (reason) {
       setMessage({ ok: false, text: errorMessage(reason) });
+      return false;
     } finally {
       setSaving(false);
     }
   }
+
+  useWorkspaceGuard({ dirty: !loading && responseFormat !== savedFormat, busy: saving, save });
 
   return (
     <section className="sol-admin-panel">

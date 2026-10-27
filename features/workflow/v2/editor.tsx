@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useWorkspaceRouter as useRouter } from "@/components/providers/workspace-context";
 import type { ReactFlowInstance } from "@xyflow/react";
 import type { WorkflowClient, WorkflowDocument } from "../api";
 import type { WorkflowRun } from "../types";
@@ -54,7 +54,7 @@ function WorkflowV2Session({ initialDocument, initialRun, client, admin, initial
   const flow = useRef<ReactFlowInstance<WorkflowV2Node> | null>(null);
   const stage = useRef<HTMLDivElement | null>(null);
   const { busy } = actions;
-  useEditorSession(document, graph, dirty, busy, actions.save);
+  useEditorSession(document, graph, dirty, busy, actions.save, runs.active || runs.debugActive);
 
   function handleDenied(_kind: "run" | "debug", message: string) {
     runs.clear();

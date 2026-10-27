@@ -83,6 +83,7 @@ export function useMediaEditor(
     draft.dirty,
     actions.busy || template.publishing,
     draft.save,
+    runs.active,
   );
   return {
     source,

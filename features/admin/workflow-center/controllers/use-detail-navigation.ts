@@ -1,16 +1,20 @@
 "use client";
+import { useCallback, useEffect, useMemo } from "react";
+import { useWorkspaceGuard, useWorkspacePage } from "@/components/providers/workspace-context";
+import { isTypedWorkflowGraph } from "@/features/workflow/types";
 import { type DetailSection } from "@/features/admin/workflow-center/detail-context";
-import { useCallback, useEffect, useLayoutEffect, useMemo } from "react";
 import { sectionEvent } from "../detail-location";
+import { useDetailBrowserGuard } from "./use-detail-browser-guard";
 import type { DetailState } from "./use-detail-state";
+
 export function useDetailNavigation(state: DetailState) {
+  const workspace = useWorkspacePage();
   const {
     id,
     source,
     router,
     params,
     returnHref,
-    path,
     section,
     session,
     setSession,
@@ -22,19 +26,29 @@ export function useDetailNavigation(state: DetailState) {
     formDirty,
     setFormDirty,
     formBusy,
+    formCanSave,
     setFormBusy,
     setFormCanSave,
     formSaveRef,
-    locationBeforePopRef,
-    navigationGuardRef,
+    current,
   } = state;
+  const navigateHref = useCallback(
+    (href: string) => {
+      if (workspace) workspace.navigate(href);
+      else {
+        window.history.pushState(window.history.state, "", href);
+        window.dispatchEvent(new Event(sectionEvent));
+        window.dispatchEvent(new Event("creativeflow:admin-query"));
+      }
+    },
+    [workspace],
+  );
   const navigate = useCallback(
     (next: DetailSection) => {
-      const url = `/admin/workflows/${encodeURIComponent(id)}/${next}${window.location.search}`;
-      window.history.pushState(window.history.state, "", url);
-      window.dispatchEvent(new Event(sectionEvent));
+      const query = params.toString();
+      navigateHref(`/admin/workflows/${encodeURIComponent(id)}/${next}${query ? `?${query}` : ""}`);
     },
-    [id],
+    [id, params, navigateHref],
   );
   const select = useCallback(
     (next: DetailSection) => {
@@ -46,123 +60,53 @@ export function useDetailNavigation(state: DetailState) {
   );
   const leave = useCallback(
     (url: string) => {
+      if (workspace) {
+        workspace.navigate(url);
+        return;
+      }
       if (session?.dirty || formDirty || formBusy) setPending(() => () => router.push(url));
       else router.push(url);
     },
-    [session?.dirty, formDirty, formBusy, setPending, router],
+    [workspace, session?.dirty, formDirty, formBusy, setPending, router],
   );
   const inspectRun = useCallback(
     (runId: string, nodeId?: string) => {
-      const query = new URLSearchParams(window.location.search);
+      const query = new URLSearchParams(params);
       query.set("inspectRun", runId);
       query.delete("runTrigger");
       if (nodeId) query.set("inspectNode", nodeId);
       else query.delete("inspectNode");
-      window.history.pushState(
-        window.history.state,
-        "",
-        `/admin/workflows/${encodeURIComponent(id)}/runs?${query}`,
-      );
-      window.dispatchEvent(new Event(sectionEvent));
-      window.dispatchEvent(new Event("creativeflow:admin-query"));
+      navigateHref(`/admin/workflows/${encodeURIComponent(id)}/runs?${query}`);
     },
-    [id],
+    [id, params, navigateHref],
   );
   const context = useMemo(
     () => ({ header, section, returnHref, select, leave, inspectRun, setSession }),
     [header, section, returnHref, select, leave, inspectRun, setSession],
   );
-
-  useEffect(() => {
-    locationBeforePopRef.current = {
-      url: window.location.pathname + window.location.search,
-      state: window.history.state,
-    };
-  }, [path, params, locationBeforePopRef]);
-  useLayoutEffect(() => {
-    navigationGuardRef.current = { formDirty, formBusy, editorDirty: !!session?.dirty };
-  }, [formDirty, formBusy, session?.dirty, navigationGuardRef]);
-  useLayoutEffect(() => {
-    function pop(event: PopStateEvent) {
-      const previous = locationBeforePopRef.current;
-      if (!previous) return;
-      const guard = navigationGuardRef.current;
-      const target = window.location.pathname + window.location.search;
-      const sameWorkflow =
-        window.location.pathname.startsWith(`/admin/workflows/${id}/`) &&
-        (new URLSearchParams(window.location.search).get("source") ?? "workflow") === source;
-      if (!guard.formDirty && !guard.formBusy && (!guard.editorDirty || sameWorkflow)) return;
-      // popstate 不可取消；在 Next 路由处理前恢复当前可写视图，待明确选择后再导航。
-      event.stopImmediatePropagation();
-      window.history.pushState(previous.state, "", previous.url);
-      setPending(() => () => {
-        if (sameWorkflow) {
-          window.history.pushState(window.history.state, "", target);
-          window.dispatchEvent(new Event(sectionEvent));
-          window.dispatchEvent(new Event("creativeflow:admin-query"));
-        } else router.push(target);
-      });
-    }
-    window.addEventListener("popstate", pop, true);
-    return () => window.removeEventListener("popstate", pop, true);
-  }, [id, source, router, locationBeforePopRef, navigationGuardRef, setPending]);
-
-  useEffect(() => {
-    if (!session?.dirty && !formDirty && !formBusy) return;
-    function unload(event: BeforeUnloadEvent) {
-      event.preventDefault();
-    }
-    function anchor(event: MouseEvent) {
-      if (
-        event.defaultPrevented ||
-        event.button !== 0 ||
-        event.metaKey ||
-        event.ctrlKey ||
-        event.shiftKey ||
-        event.altKey
-      )
-        return;
-      const link = (event.target as Element).closest<HTMLAnchorElement>("a[href]");
-      if (
-        !link ||
-        link.target === "_blank" ||
-        link.hasAttribute("download") ||
-        (link.hash && link.pathname === location.pathname)
-      )
-        return;
-      event.preventDefault();
-      event.stopPropagation();
-      leave(link.href);
-    }
-    window.addEventListener("beforeunload", unload);
-    window.document.addEventListener("click", anchor, true);
-    return () => {
-      window.removeEventListener("beforeunload", unload);
-      window.document.removeEventListener("click", anchor, true);
-    };
-  }, [session?.dirty, formDirty, formBusy, leave]);
+  useDetailBrowserGuard(state, leave, !workspace);
 
   function saveIsBlocked() {
     return leaving || session?.busy || formBusy || (formDirty && !formSaveRef.current);
   }
-  async function saveAndProceed() {
-    if (saveIsBlocked()) return;
+  async function saveChanges(): Promise<boolean> {
+    if (saveIsBlocked()) return false;
     setLeaving(true);
     try {
-      if (formDirty && formSaveRef.current && !(await formSaveRef.current())) return;
-      if (
-        session?.dirty &&
-        !(formDirty && source === "workflow" && section === "settings") &&
-        !(await session.save())
-      )
-        return;
+      if (formDirty && formSaveRef.current && !(await formSaveRef.current())) return false;
+      const settingsSavedGraph = formDirty && source === "workflow" && section === "settings";
+      if (session?.dirty && !settingsSavedGraph && !(await session.save())) return false;
       setFormDirty(false);
-      const next = pending;
-      setPending(null);
-      next?.();
+      return true;
     } finally {
       setLeaving(false);
     }
+  }
+  async function saveAndProceed() {
+    if (!(await saveChanges())) return;
+    const next = pending;
+    setPending(null);
+    next?.();
   }
   const registerForm = useCallback(
     (dirty: boolean, save: (() => Promise<boolean>) | null, busy = false) => {
@@ -173,6 +117,25 @@ export function useDetailNavigation(state: DetailState) {
     },
     [formSaveRef, setFormBusy, setFormCanSave, setFormDirty],
   );
-
+  useWorkspaceGuard({
+    dirty: !!session?.dirty || formDirty,
+    busy: !!session?.busy || formBusy || leaving,
+    leaveSection: formDirty || formBusy,
+    discard: () => setFormDirty(false),
+    save: !formDirty || formCanSave ? saveChanges : undefined,
+    message:
+      formDirty && !formCanSave
+        ? "请在原页面确认发布或授权参数；关闭将清除未确认输入和一次性凭证。"
+        : undefined,
+  });
+  const updateMeta = workspace?.updateMeta;
+  useEffect(() => {
+    if (current)
+      updateMeta?.({
+        title: current.name,
+        subtitle: isTypedWorkflowGraph(current.graph) ? "通用编排" : "媒体创作",
+        running: session?.running ?? false,
+      });
+  }, [updateMeta, current, session?.running]);
   return { navigate, select, leave, inspectRun, context, saveAndProceed, registerForm };
 }

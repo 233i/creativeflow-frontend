@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useT } from "@/components/providers/i18n-provider";
 import * as adminApi from "@/features/admin/api";
 import type { WorkflowClient } from "../api";
-import { useWorkflowStore } from "../store";
+import { useWorkflowStoreApi } from "../store";
 import { validateWorkflow, type WorkflowValidationIssue } from "../validation";
 import { useCommandLock } from "./use-command-lock";
 import { useRunCreation } from "./use-run-creation";
@@ -34,6 +34,7 @@ export function useMediaActions({
   videoExtensionSupported: boolean;
 }) {
   const t = useT();
+  const storeApi = useWorkflowStoreApi();
   const { executionWorkflowId, setExecutionWorkflowId, setError } = session;
   const [issues, setIssues] = useState<WorkflowValidationIssue[]>([]);
   const lock = useCommandLock<Command>(source.id);
@@ -61,7 +62,7 @@ export function useMediaActions({
     }
   }
   function validate() {
-    const state = useWorkflowStore.getState();
+    const state = storeApi.getState();
     const validation = validateWorkflow(
       { nodes: state.nodes, edges: state.edges },
       { videoExtensionSupported },

@@ -16,6 +16,7 @@ import { Brand } from "@/components/layout/brand";
 import { Button } from "@/components/ui/button";
 import { ADMIN_NAVIGATION, adminTabLabel, type AdminTab } from "@/features/admin/admin-navigation";
 import { cn } from "@/lib/utils";
+import { useWorkspacePage } from "@/components/providers/workspace-context";
 import { useAdminPreference } from "./admin-preferences";
 
 function subscribeMobile(listener: () => void) {
@@ -23,6 +24,19 @@ function subscribeMobile(listener: () => void) {
   const query = window.matchMedia("(max-width: 800px)");
   query.addEventListener("change", listener);
   return () => query.removeEventListener("change", listener);
+}
+
+function useAdminMobile() {
+  return useSyncExternalStore(
+    subscribeMobile,
+    () =>
+      typeof window.matchMedia === "function" && window.matchMedia("(max-width: 800px)").matches,
+    () => false,
+  );
+}
+
+function shellClass(collapsed: boolean, opened: boolean) {
+  return cn("sol-admin-shell", collapsed && "is-collapsed", opened && "is-mobile-open");
 }
 
 interface AdminShellProps {
@@ -38,7 +52,13 @@ interface AdminShellProps {
 }
 
 /** 后台布局只组合导航与插槽，不请求数据、不拥有页面业务状态。 */
-export function AdminShell({
+export function AdminShell(props: AdminShellProps) {
+  const page = useWorkspacePage();
+  if (page) return props.children;
+  return <AdminShellLayout {...props} />;
+}
+
+function AdminShellLayout({
   activeTab,
   username,
   onTabChange,
@@ -52,12 +72,7 @@ export function AdminShell({
   const [sidebar, setSidebar] = useAdminPreference("sidebar", compact ? "collapsed" : "expanded");
   const [density] = useAdminPreference("density", "default");
   const [mobileOpen, setMobileOpen] = useState(false);
-  const mobile = useSyncExternalStore(
-    subscribeMobile,
-    () =>
-      typeof window.matchMedia === "function" && window.matchMedia("(max-width: 800px)").matches,
-    () => false,
-  );
+  const mobile = useAdminMobile();
   const opened = mobileOpen && mobile;
   const menuButton = useRef<HTMLButtonElement>(null);
   const navigationRef = useRef<HTMLElement>(null);
@@ -102,7 +117,7 @@ export function AdminShell({
   }
   return (
     <div
-      className={cn("sol-admin-shell", collapsed && "is-collapsed", opened && "is-mobile-open")}
+      className={shellClass(collapsed, opened)}
       data-density={density === "compact" ? "compact" : "default"}
     >
       {opened && (

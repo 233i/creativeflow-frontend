@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import type { WorkflowClient } from "../api";
-import { useWorkflowStore } from "../store";
+import { useWorkflowStoreApi } from "../store";
 import type { WorkflowGraph, WorkflowPartialRerunPreview, WorkflowRun } from "../types";
 import { useRequestScope } from "./use-request-scope";
 import { accessDenied, errorMessage } from "./run-errors";
@@ -25,6 +25,7 @@ export function useMediaPartialRerun(
   onDenied?: (reason: unknown) => void,
 ) {
   const capture = useRequestScope(`${workflowId}/${run?.id}`);
+  const storeApi = useWorkflowStoreApi();
   const sequence = useRef(0);
   const [state, setState] = useState<Selection>({ status: "idle" });
   const selection = state.status === "selecting" && state.source.id === run?.id ? state : null;
@@ -55,7 +56,7 @@ export function useMediaPartialRerun(
     } catch (reason) {
       if (isLatest() && accessDenied(reason)) {
         clear();
-        useWorkflowStore.getState().setRun(null);
+        storeApi.getState().setRun(null);
         onDenied?.(reason);
         return;
       }
@@ -81,11 +82,7 @@ export function useMediaPartialRerun(
     setState({ ...selection, preview: null, pendingNodeId: nodeId, error: null });
     try {
       const preview = await client.previewPartialWorkflowRerun(workflowId, sourceId, nodeId);
-      if (
-        !current() ||
-        request !== sequence.current ||
-        useWorkflowStore.getState().run?.id !== sourceId
-      )
+      if (!current() || request !== sequence.current || storeApi.getState().run?.id !== sourceId)
         return;
       if (preview.sourceRunId !== sourceId) throw new Error("重跑范围与原运行不一致，请重新查询。");
       setState((value) =>
@@ -94,7 +91,7 @@ export function useMediaPartialRerun(
     } catch (reason) {
       if (isLatest() && accessDenied(reason)) {
         clear();
-        useWorkflowStore.getState().setRun(null);
+        storeApi.getState().setRun(null);
         onDenied?.(reason);
         return;
       }

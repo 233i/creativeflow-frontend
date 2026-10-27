@@ -47,6 +47,13 @@ export function createApiClient({
 
     if (response.status === 204) return undefined as T;
     if (!response.ok) {
+      if (
+        response.status === 401 &&
+        /^\/api\/(?:v1\/)?admin(?:\/|$)/.test(`${baseUrl}${path}`) &&
+        typeof window !== "undefined"
+      ) {
+        window.dispatchEvent(new Event("creativeflow:admin-session-expired"));
+      }
       const { code, details } = await readErrorBody(response);
       throw createError({
         status: response.status,

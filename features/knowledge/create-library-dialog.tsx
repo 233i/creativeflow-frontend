@@ -7,6 +7,7 @@ import { Dialog, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { knowledgeApi, type KnowledgeLibrary } from "./api";
 import { KnowledgeError } from "./knowledge-ui";
 import styles from "./knowledge.module.css";
+import { useWorkspaceGuard } from "@/components/providers/workspace-context";
 
 export function CreateLibraryDialog({
   models,
@@ -23,6 +24,11 @@ export function CreateLibraryDialog({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const lock = useRef(false);
+  useWorkspaceGuard({
+    dirty: !!name || !!description || !!modelId,
+    busy,
+    message: "新建知识库尚未确认，关闭页签会放弃输入。",
+  });
 
   async function submit() {
     if (lock.current || !name.trim() || !modelId) return;
