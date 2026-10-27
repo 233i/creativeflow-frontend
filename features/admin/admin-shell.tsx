@@ -38,6 +38,7 @@ interface AdminShellProps {
   notice?: ReactNode;
   compact?: boolean;
   workspace?: boolean;
+  headerTabs?: ReactNode;
   children: ReactNode;
 }
 
@@ -57,6 +58,7 @@ function AdminShellLayout({
   children,
   compact = false,
   workspace = false,
+  headerTabs,
 }: AdminShellProps) {
   const [sidebar, setSidebar] = useAdminPreference("sidebar", compact ? "collapsed" : "expanded");
   const [density] = useAdminPreference("density", "default");
@@ -186,7 +188,7 @@ function AdminShellLayout({
         </Link>
       </aside>
       <div className="sol-admin-main" inert={opened}>
-        <header className="sol-admin-header">
+        <header className={cn("sol-admin-header", headerTabs && "has-tabs")}>
           <button
             ref={menuButton}
             className="sol-admin-mobile-menu"
@@ -197,8 +199,14 @@ function AdminShellLayout({
           >
             <Menu size={18} />
           </button>
-          <div className="ml-auto flex shrink-0 items-center gap-3">
-            <span className="text-sm text-muted-foreground">{username}</span>
+          <div className="sol-admin-header-tabs">{headerTabs}</div>
+          <div className="sol-admin-header-actions">
+            <span
+              className="sol-admin-header-username text-sm text-muted-foreground"
+              title={username}
+            >
+              {username}
+            </span>
             <Button
               variant="ghost"
               size="icon-sm"
@@ -207,9 +215,9 @@ function AdminShellLayout({
             >
               <KeyRound className="size-4" />
             </Button>
-            <Button variant="ghost" size="sm" onPress={onLogout}>
+            <Button variant="ghost" size="sm" aria-label="退出" onPress={onLogout}>
               <LogOut className="size-4" aria-hidden />
-              退出
+              <span className="sol-admin-logout-label">退出</span>
             </Button>
           </div>
         </header>

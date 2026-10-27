@@ -146,6 +146,33 @@
   border-bottom: 1px solid var(--border);
   padding: 0 16px;
 }
+.sol-admin-header.has-tabs {
+  --workspace-toolbar-height: 40px;
+  height: var(--workspace-toolbar-height);
+  min-height: var(--workspace-toolbar-height);
+  gap: 8px;
+  padding: 0 12px 0 8px;
+  background: var(--muted);
+}
+.sol-admin-header-tabs {
+  display: flex;
+  min-width: 0;
+  height: 100%;
+  flex: 1;
+}
+.sol-admin-header-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+.sol-admin-header-username {
+  max-width: 128px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .sol-admin-notice {
   flex: none;
   border-radius: 0;
@@ -170,11 +197,9 @@
   flex-direction: column;
 }
 .admin-workspace-tabbar {
-  flex: none;
+  flex: 1;
   min-width: 0;
-  border-bottom: 1px solid var(--border);
-  background: var(--muted);
-  padding: 5px 8px 0;
+  height: 100%;
 }
 .admin-workspace-tabbar .t-tabs {
   min-width: 0;
@@ -183,11 +208,23 @@
 .admin-workspace-tabbar .t-tabs__content {
   display: none;
 }
+.admin-workspace-tabbar .t-tabs__nav {
+  /* 组件内联的 48px 最小高度会撑高整个工具栏。 */
+  min-height: 0 !important;
+  height: calc(var(--workspace-toolbar-height) - 1px);
+}
+.admin-workspace-tabbar .t-tabs__operations,
+.admin-workspace-tabbar .t-tabs__btn {
+  height: calc(var(--workspace-toolbar-height) - 1px);
+}
+.admin-workspace-tabbar .t-tabs__btn {
+  width: 28px;
+}
 .admin-workspace-tabbar .t-tabs__nav-item {
-  height: 34px;
+  height: calc(var(--workspace-toolbar-height) - 1px);
   min-width: 78px;
   max-width: 232px;
-  border-radius: 7px 7px 0 0;
+  border-radius: 0;
   font-size: 12px;
 }
 .admin-workspace-tabbar .t-tabs__nav-item-wrapper {
@@ -272,9 +309,6 @@
 @media (max-width: 640px) {
   .admin-workspace-pane.is-management {
     padding: 10px;
-  }
-  .admin-workspace-tabbar {
-    padding-inline: 4px;
   }
   .admin-workspace-tab-title {
     max-width: 110px;
@@ -844,6 +878,23 @@
   }
   .sol-admin-header {
     padding: 0 12px;
+  }
+  .sol-admin-header.has-tabs {
+    --workspace-toolbar-height: 44px;
+    gap: 4px;
+    padding: 0 6px;
+  }
+  .sol-admin-header.has-tabs .sol-admin-header-actions {
+    gap: 4px;
+  }
+  .sol-admin-header.has-tabs .sol-admin-header-username,
+  .sol-admin-header.has-tabs .sol-admin-logout-label {
+    display: none;
+  }
+  .sol-admin-header.has-tabs .sol-admin-header-actions button {
+    width: 36px;
+    min-width: 36px;
+    padding: 0;
   }
   .sol-admin-content {
     padding: 12px;

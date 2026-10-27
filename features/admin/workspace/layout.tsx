@@ -65,6 +65,15 @@ function AuthenticatedWorkspace({
       workspace
       onTabChange={actions.menu}
       onLogout={logout}
+      headerTabs={
+        <WorkspaceTabs
+          tabs={state.tabs}
+          activeKey={state.activeKey}
+          onSelect={actions.select}
+          onAction={actions.action}
+          onReorder={state.reorder}
+        />
+      }
       notice={
         identity.mustChangePassword && (
           <Alert
@@ -83,13 +92,6 @@ function AuthenticatedWorkspace({
       }
     >
       <div className="admin-workspace" data-testid="admin-workspace">
-        <WorkspaceTabs
-          tabs={state.tabs}
-          activeKey={state.activeKey}
-          onSelect={actions.select}
-          onAction={actions.action}
-          onReorder={state.reorder}
-        />
         {actions.error && (
           <Alert
             theme="warning"
