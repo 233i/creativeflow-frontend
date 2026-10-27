@@ -63,7 +63,6 @@ function AuthenticatedWorkspace({
       activeTab={active.menu}
       username={identity.username}
       workspace
-      breadcrumb={<span className="truncate">{active.title}</span>}
       onTabChange={actions.menu}
       onLogout={logout}
       notice={

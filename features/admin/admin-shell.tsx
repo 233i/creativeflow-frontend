@@ -1,20 +1,11 @@
 "use client";
 
-import {
-  ArrowLeft,
-  ChevronRight,
-  KeyRound,
-  LogOut,
-  Menu,
-  PanelLeftClose,
-  PanelLeftOpen,
-  X,
-} from "lucide-react";
+import { ArrowLeft, KeyRound, LogOut, Menu, PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { Brand } from "@/components/layout/brand";
 import { Button } from "@/components/ui/button";
-import { ADMIN_NAVIGATION, adminTabLabel, type AdminTab } from "@/features/admin/admin-navigation";
+import { ADMIN_NAVIGATION, type AdminTab } from "@/features/admin/admin-navigation";
 import { cn } from "@/lib/utils";
 import { useWorkspacePage } from "@/components/providers/workspace-context";
 import { useAdminPreference } from "./admin-preferences";
@@ -47,7 +38,6 @@ interface AdminShellProps {
   notice?: ReactNode;
   compact?: boolean;
   workspace?: boolean;
-  breadcrumb?: ReactNode;
   children: ReactNode;
 }
 
@@ -67,7 +57,6 @@ function AdminShellLayout({
   children,
   compact = false,
   workspace = false,
-  breadcrumb,
 }: AdminShellProps) {
   const [sidebar, setSidebar] = useAdminPreference("sidebar", compact ? "collapsed" : "expanded");
   const [density] = useAdminPreference("density", "default");
@@ -198,24 +187,17 @@ function AdminShellLayout({
       </aside>
       <div className="sol-admin-main" inert={opened}>
         <header className="sol-admin-header">
-          <div className="flex min-w-0 items-center gap-2 text-sm text-muted-foreground">
-            <button
-              ref={menuButton}
-              className="sol-admin-mobile-menu"
-              aria-label="展开管理导航"
-              aria-expanded={opened}
-              aria-controls="admin-navigation"
-              onClick={() => setMobileOpen(!opened)}
-            >
-              <Menu size={18} />
-            </button>
-            <span className="hidden sm:inline">管理后台</span>
-            <ChevronRight className="hidden size-3.5 sm:block" aria-hidden />
-            {breadcrumb ?? (
-              <span className="truncate text-foreground">{adminTabLabel(activeTab)}</span>
-            )}
-          </div>
-          <div className="flex shrink-0 items-center gap-3">
+          <button
+            ref={menuButton}
+            className="sol-admin-mobile-menu"
+            aria-label="展开管理导航"
+            aria-expanded={opened}
+            aria-controls="admin-navigation"
+            onClick={() => setMobileOpen(!opened)}
+          >
+            <Menu size={18} />
+          </button>
+          <div className="ml-auto flex shrink-0 items-center gap-3">
             <span className="text-sm text-muted-foreground">{username}</span>
             <Button
               variant="ghost"

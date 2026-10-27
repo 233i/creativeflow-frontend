@@ -14,7 +14,6 @@ export function DeletedWorkflowDetail({ controller }: { controller: WorkflowDeta
       username={identity.username}
       compact
       workspace
-      breadcrumb={<span>工作流 / {item.name}</span>}
       onTabChange={(tab) => router.push(adminTabHref(tab))}
       onLogout={() => {
         void adminApi.logout().finally(() => setIdentity(null));

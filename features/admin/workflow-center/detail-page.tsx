@@ -30,7 +30,6 @@ export function WorkflowDetailPage(props: WorkflowDetailProps) {
     setPending,
     formDirty,
     formBusy,
-    current,
     leave,
     context,
   } = controller;
@@ -48,7 +47,6 @@ export function WorkflowDetailPage(props: WorkflowDetailProps) {
       username={identity.username}
       compact
       workspace
-      breadcrumb={<span className="truncate">工作流 / {current?.name ?? "详情"}</span>}
       onTabChange={(tab) => leave(adminTabHref(tab))}
       onLogout={() => {
         const logout = () => {
